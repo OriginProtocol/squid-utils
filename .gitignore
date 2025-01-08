@@ -1,0 +1,7 @@
+node_modules/
+lib/
+
+# IDE and editor files
+.vscode/
+.idea/
+.DS_Store
