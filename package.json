@@ -22,9 +22,11 @@
     "@subsquid/evm-processor": "^1.27.0",
     "@subsquid/typeorm-store": "^1.5.1",
     "dayjs": "^1.11.13",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "node-fetch": "^2.7.0"
   },
   "devDependencies": {
-    "@types/lodash": "^4.17.14"
+    "@types/lodash": "^4.17.14",
+    "@types/node-fetch": "^2.6.12"
   }
 }
