@@ -1,0 +1,1 @@
+export declare const DECIMALS_18 = 1000000000000000000n;
