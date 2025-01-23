@@ -4,9 +4,8 @@ import duration from 'dayjs/plugin/duration'
 import utc from 'dayjs/plugin/utc'
 import { compact } from 'lodash'
 import { Chain } from 'viem'
-import { arbitrum, base, mainnet } from 'viem/chains'
+import { arbitrum, base, mainnet, sonic } from 'viem/chains'
 
-import { KnownArchivesEVM, lookupArchive } from '@subsquid/archive-registry'
 import { DataHandlerContext, EvmBatchProcessor, EvmBatchProcessorFields } from '@subsquid/evm-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { blockFrequencyTracker } from './blockFrequencyUpdater'
@@ -62,8 +61,8 @@ export const createEvmBatchProcessor = (config: ChainConfig) => {
     })
 
   if (process.env.DISABLE_ARCHIVE !== 'true') {
-    console.log(`Archive: ${config.archive}`)
-    processor.setGateway(lookupArchive(config.archive))
+    console.log(`Archive gateway: ${config.gateway}`)
+    processor.setGateway(config.gateway)
   } else {
     console.log(`Archive disabled`)
   }
@@ -72,7 +71,7 @@ export const createEvmBatchProcessor = (config: ChainConfig) => {
 }
 
 export interface SquidProcessor {
-  chainId?: 1 | 42161 | 8453
+  chainId?: keyof typeof chainConfigs
   stateSchema?: string
   processors: Processor[]
   postProcessors?: Processor[]
@@ -94,14 +93,14 @@ let initialized = false
 
 export interface ChainConfig {
   chain: Chain
-  archive: KnownArchivesEVM
+  gateway: string
   endpoints: string[]
 }
 
 export const chainConfigs = {
   [mainnet.id]: {
     chain: mainnet,
-    archive: 'eth-mainnet',
+    gateway: 'https://v2.archive.subsquid.io/network/ethereum-mainnet',
     endpoints: compact([
       process.env[process.env.RPC_ENV ?? 'RPC_ENDPOINT'],
       process.env[process.env.RPC_ENV_BACKUP ?? 'RPC_ETH_HTTP'],
@@ -109,7 +108,7 @@ export const chainConfigs = {
   },
   [arbitrum.id]: {
     chain: arbitrum,
-    archive: 'arbitrum',
+    gateway: 'https://v2.archive.subsquid.io/network/arbitrum-one',
     endpoints: compact([
       process.env[process.env.RPC_ARBITRUM_ENV ?? 'RPC_ARBITRUM_ENDPOINT'],
       process.env[process.env.RPC_ARBITRUM_ENV_BACKUP ?? 'RPC_ARBITRUM_ONE_HTTP'],
@@ -117,10 +116,18 @@ export const chainConfigs = {
   },
   [base.id]: {
     chain: base,
-    archive: 'base-mainnet',
+    gateway: 'https://v2.archive.subsquid.io/network/base-mainnet',
     endpoints: compact([
       process.env[process.env.RPC_BASE_ENV ?? 'RPC_BASE_ENDPOINT'],
       process.env[process.env.RPC_BASE_ENV_BACKUP ?? 'RPC_BASE_HTTP'],
+    ]),
+  },
+  [sonic.id]: {
+    chain: sonic,
+    gateway: 'https://v2.archive.subsquid.io/network/sonic-mainnet',
+    endpoints: compact([
+      process.env[process.env.RPC_SONIC_ENV ?? 'RPC_SONIC_ENDPOINT'],
+      process.env[process.env.RPC_SONIC_ENV_BACKUP ?? 'RPC_SONIC_HTTP'],
     ]),
   },
 } as const
