@@ -79,6 +79,7 @@ export const createEvmBatchProcessor = (config: ChainConfig, options?: {
 }
 
 export interface SquidProcessor {
+  fromNow?: boolean
   chainId?: keyof typeof chainConfigs
   stateSchema: string
   processors: Processor[]
@@ -141,8 +142,10 @@ export const chainConfigs = {
   },
 } as const
 
-export const run = async ({ chainId = 1, stateSchema, processors, postProcessors, validators, postValidation }: SquidProcessor) => {
-  assert(!processors.find((p) => p.from === undefined), 'All processors must have a `from` defined')
+export const run = async ({ fromNow, chainId = 1, stateSchema, processors, postProcessors, validators, postValidation }: SquidProcessor) => {
+  if (!fromNow) {
+    assert(!processors.find((p) => p.from === undefined), 'All processors must have a `from` defined')
+  }
 
   if (process.env.PROCESSOR) {
     processors = processors.filter((p) => p.name?.includes(process.env.PROCESSOR!))

@@ -96,6 +96,7 @@ export declare const createEvmBatchProcessor: (config: ChainConfig, options?: {
     };
 }>;
 export interface SquidProcessor {
+    fromNow?: boolean;
     chainId?: keyof typeof chainConfigs;
     stateSchema: string;
     processors: Processor[];
@@ -545,4 +546,4 @@ export declare const chainConfigs: {
         readonly endpoints: string[];
     };
 };
-export declare const run: ({ chainId, stateSchema, processors, postProcessors, validators, postValidation }: SquidProcessor) => Promise<void>;
+export declare const run: ({ fromNow, chainId, stateSchema, processors, postProcessors, validators, postValidation }: SquidProcessor) => Promise<void>;
