@@ -101,7 +101,7 @@ export interface SquidProcessor {
     processors: Processor[];
     postProcessors?: Processor[];
     validators?: Pick<Processor, 'process' | 'name'>[];
-    after?: (ctx: Context) => Promise<void>;
+    postValidation?: (ctx: Context) => Promise<void>;
 }
 export interface Processor {
     name?: string;
@@ -545,4 +545,4 @@ export declare const chainConfigs: {
         readonly endpoints: string[];
     };
 };
-export declare const run: ({ chainId, stateSchema, processors, postProcessors, validators, after }: SquidProcessor) => Promise<void>;
+export declare const run: ({ chainId, stateSchema, processors, postProcessors, validators, postValidation }: SquidProcessor) => Promise<void>;

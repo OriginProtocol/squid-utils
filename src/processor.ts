@@ -84,7 +84,7 @@ export interface SquidProcessor {
   processors: Processor[]
   postProcessors?: Processor[]
   validators?: Pick<Processor, 'process' | 'name'>[]
-  after?: (ctx: Context) => Promise<void>
+  postValidation?: (ctx: Context) => Promise<void>
 }
 
 export interface Processor {
@@ -141,7 +141,7 @@ export const chainConfigs = {
   },
 } as const
 
-export const run = async ({ chainId = 1, stateSchema, processors, postProcessors, validators, after }: SquidProcessor) => {
+export const run = async ({ chainId = 1, stateSchema, processors, postProcessors, validators, postValidation }: SquidProcessor) => {
   assert(!processors.find((p) => p.from === undefined), 'All processors must have a `from` defined')
 
   if (process.env.PROCESSOR) {
@@ -268,8 +268,8 @@ export const run = async ({ chainId = 1, stateSchema, processors, postProcessors
             validatorTimes.forEach((t) => t())
           }
         }
-        if (after) {
-          await after(ctx)
+        if (postValidation) {
+          await postValidation(ctx)
         }
       } finally {
         printStats(ctx)
