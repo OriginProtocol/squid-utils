@@ -1,4 +1,4 @@
-import { Trace } from './processor';
+import { Trace } from './types';
 type TraceType = 'call' | 'create' | 'suicide' | 'reward';
 type TraceFilterParams = {
     type: TraceType[];

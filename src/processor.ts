@@ -6,13 +6,14 @@ import { compact } from 'lodash'
 import { Chain } from 'viem'
 import { arbitrum, base, mainnet, sonic } from 'viem/chains'
 
-import { DataHandlerContext, EvmBatchProcessor, EvmBatchProcessorFields, FieldSelection } from '@subsquid/evm-processor'
-import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
+import { EvmBatchProcessor, FieldSelection } from '@subsquid/evm-processor'
+import { TypeormDatabase } from '@subsquid/typeorm-store'
 import { blockFrequencyTracker } from './blockFrequencyUpdater'
 import { calculateBlockRate } from './calculateBlockRate'
 import { printStats } from './processing-stats'
 
 import './polyfills/rpc-issues'
+import { Context } from './types'
 
 dayjs.extend(duration)
 dayjs.extend(utc)
@@ -267,16 +268,3 @@ export const run = ({ chainId = 1, stateSchema, processors, postProcessors, vali
     },
   )
 }
-
-export type Fields = EvmBatchProcessorFields<ReturnType<typeof createEvmBatchProcessor>>
-export type Context = DataHandlerContext<Store, Fields> & {
-  chain: Chain
-  blockRate: number
-  blocksWithContent: Block[]
-  frequencyBlocks: Block[]
-  __state: Map<string, unknown>
-}
-export type Block = Context['blocks']['0']
-export type Log = Context['blocks']['0']['logs']['0']
-export type Transaction = Context['blocks']['0']['transactions']['0']
-export type Trace = Context['blocks']['0']['traces']['0']

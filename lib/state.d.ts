@@ -1,4 +1,4 @@
-import { Context } from './processor';
+import { Context } from './types';
 export declare const cached: <I extends [Context, ...any[]], R>(keyFn: (...params: I) => string, fn: (...params: I) => Promise<R>) => (...params: I) => Promise<R>;
 export declare const useProcessorState: <T>(ctx: Context, key: string, defaultValue?: T) => readonly [T, (value: T) => void];
 /**

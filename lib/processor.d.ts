@@ -1,7 +1,7 @@
 import { Chain } from 'viem';
-import { DataHandlerContext, EvmBatchProcessor, EvmBatchProcessorFields, FieldSelection } from '@subsquid/evm-processor';
-import { Store } from '@subsquid/typeorm-store';
+import { EvmBatchProcessor, FieldSelection } from '@subsquid/evm-processor';
 import './polyfills/rpc-issues';
+import { Context } from './types';
 export declare const createEvmBatchProcessor: (config: ChainConfig, options?: {
     fields: FieldSelection;
 }) => EvmBatchProcessor<{
@@ -545,15 +545,3 @@ export declare const chainConfigs: {
     };
 };
 export declare const run: ({ chainId, stateSchema, processors, postProcessors, validators }: SquidProcessor) => void;
-export type Fields = EvmBatchProcessorFields<ReturnType<typeof createEvmBatchProcessor>>;
-export type Context = DataHandlerContext<Store, Fields> & {
-    chain: Chain;
-    blockRate: number;
-    blocksWithContent: Block[];
-    frequencyBlocks: Block[];
-    __state: Map<string, unknown>;
-};
-export type Block = Context['blocks']['0'];
-export type Log = Context['blocks']['0']['logs']['0'];
-export type Transaction = Context['blocks']['0']['transactions']['0'];
-export type Trace = Context['blocks']['0']['traces']['0'];

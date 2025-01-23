@@ -1,4 +1,4 @@
-import { Context } from './processor'
+import { Context } from './types'
 
 export const cached = <I extends [Context, ...any[]], R>(
   keyFn: (...params: I) => string,

@@ -1,6 +1,6 @@
 import { arbitrum, base, mainnet } from 'viem/chains'
 
-import { Context } from './processor'
+import { Context } from './types'
 
 const blockRates: Record<number, number> = {
   [mainnet.id]: 12.04,

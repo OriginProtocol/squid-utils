@@ -1,4 +1,4 @@
-import { Context } from './processor'
+import { Context } from './types'
 
 export const processingStats = {
   rpcCalls: 0,

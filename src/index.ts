@@ -20,4 +20,6 @@ export * from './readLinesFromUrlInBatches'
 export * from './retry'
 export * from './state'
 export * from './traceFilter'
+export * from './transactionFilter'
+export * from './types'
 

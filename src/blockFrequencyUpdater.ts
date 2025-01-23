@@ -3,7 +3,7 @@ import duration from 'dayjs/plugin/duration'
 import utc from 'dayjs/plugin/utc'
 import { base } from 'viem/chains'
 
-import { Block, Context } from './processor'
+import { Block, Context } from './types'
 
 dayjs.extend(duration)
 dayjs.extend(utc)

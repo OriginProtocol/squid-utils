@@ -1,4 +1,4 @@
-import { Log } from './processor';
+import { Log } from './types';
 type LogFilterParams = {
     address?: string[];
     topic0?: string[];

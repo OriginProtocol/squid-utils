@@ -3,7 +3,7 @@ import { arbitrum, mainnet } from 'viem/chains'
 
 import { type AbiFunction, type FunctionArguments } from '@subsquid/evm-abi'
 import { Multicall } from './abi/multicall'
-import { Context } from './processor'
+import { Context } from './types'
 
 const MULTICALL_CONTRACTS: Record<number, undefined | { from: number; address: string }> = {
   [mainnet.id]: {

@@ -1,6 +1,6 @@
 import { pad as viemPad } from 'viem'
 
-import { Log } from './processor'
+import { Log } from './types'
 
 type LogFilterParams = {
   address?: string[]

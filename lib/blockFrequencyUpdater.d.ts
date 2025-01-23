@@ -1,4 +1,4 @@
-import { Block, Context } from './processor';
+import { Block, Context } from './types';
 export declare const blockFrequencyTracker: (params: {
     from: number;
 }) => (ctx: Context, block: Block) => any;
