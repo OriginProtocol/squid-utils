@@ -179,6 +179,7 @@ export const run = async ({ fromNow, chainId = 1, stateSchema, processors, postP
     from = Number(latestBlock.number)
   }
 
+  from = process.env.BLOCK_FROM ? Number(process.env.BLOCK_FROM) : from
   const to = process.env.BLOCK_TO ? Number(process.env.BLOCK_TO) : undefined
   evmBatchProcessor.setBlockRange({
     from,
