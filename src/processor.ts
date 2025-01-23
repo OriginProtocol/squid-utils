@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import utc from 'dayjs/plugin/utc'
 import { compact } from 'lodash'
-import { Chain } from 'viem'
+import { Chain, createPublicClient, http } from 'viem'
 import { arbitrum, base, mainnet, sonic } from 'viem/chains'
 
 import { EvmBatchProcessor, FieldSelection } from '@subsquid/evm-processor'
@@ -80,10 +80,11 @@ export const createEvmBatchProcessor = (config: ChainConfig, options?: {
 
 export interface SquidProcessor {
   chainId?: keyof typeof chainConfigs
-  stateSchema?: string
+  stateSchema: string
   processors: Processor[]
   postProcessors?: Processor[]
   validators?: Pick<Processor, 'process' | 'name'>[]
+  after?: (ctx: Context) => Promise<void>
 }
 
 export interface Processor {
@@ -140,7 +141,7 @@ export const chainConfigs = {
   },
 } as const
 
-export const run = ({ chainId = 1, stateSchema, processors, postProcessors, validators }: SquidProcessor) => {
+export const run = async ({ chainId = 1, stateSchema, processors, postProcessors, validators, after }: SquidProcessor) => {
   assert(!processors.find((p) => p.from === undefined), 'All processors must have a `from` defined')
 
   if (process.env.PROCESSOR) {
@@ -158,12 +159,23 @@ export const run = ({ chainId = 1, stateSchema, processors, postProcessors, vali
   // console.log('config', JSON.stringify(config, null, 2))
   const evmBatchProcessor = createEvmBatchProcessor(config)
 
-  const from = process.env.BLOCK_FROM
-    ? Number(process.env.BLOCK_FROM)
-    : Math.min(
-        ...(processors.map((p) => p.from).filter((x) => x) as number[]),
-        ...((postProcessors ?? []).map((p) => p.from).filter((x) => x) as number[]),
-      )
+
+  const client = createPublicClient({ chain: config.chain, transport: http(config.endpoints[0]) })
+  const latestBlock = await client.getBlock()
+
+  const database = new TypeormDatabase({ supportHotBlocks: true, stateSchema })
+
+  // In order to resume from the last processed block while having no `from` block declared,
+  //   we must pull the state and use that as our `from` block.
+  const databaseState = await database.connect()
+  const latestHeight = databaseState.height
+  await database.disconnect()
+
+  let from = [...processors, ...(postProcessors ?? [])].reduce((min, p) => (p.from && p.from < min ? p.from : min), latestHeight)
+  if (from === -1) {
+    from = Number(latestBlock.number)
+  }
+
   const to = process.env.BLOCK_TO ? Number(process.env.BLOCK_TO) : undefined
   evmBatchProcessor.setBlockRange({
     from,
@@ -255,6 +267,9 @@ export const run = ({ chainId = 1, stateSchema, processors, postProcessors, vali
             ctx.log.info('===== Validator Times =====')
             validatorTimes.forEach((t) => t())
           }
+        }
+        if (after) {
+          await after(ctx)
         }
       } finally {
         printStats(ctx)
