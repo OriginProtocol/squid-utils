@@ -18,3 +18,4 @@ export * from './range';
 export * from './readLinesFromUrlInBatches';
 export * from './retry';
 export * from './state';
+export * from './traceFilter';

@@ -9,7 +9,9 @@ function replacer(key: string, value: unknown) {
 export const jsonify = (
   value: any,
   customReplacer?: (key: string, value: unknown) => unknown,
+  indent?: number,
 ) =>
   JSON.stringify(value, (key, value) =>
     replacer(key, customReplacer?.(key, value) ?? value),
+    indent,
   )

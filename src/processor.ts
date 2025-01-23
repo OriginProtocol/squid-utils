@@ -6,7 +6,7 @@ import { compact } from 'lodash'
 import { Chain } from 'viem'
 import { arbitrum, base, mainnet, sonic } from 'viem/chains'
 
-import { DataHandlerContext, EvmBatchProcessor, EvmBatchProcessorFields } from '@subsquid/evm-processor'
+import { DataHandlerContext, EvmBatchProcessor, EvmBatchProcessorFields, FieldSelection } from '@subsquid/evm-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { blockFrequencyTracker } from './blockFrequencyUpdater'
 import { calculateBlockRate } from './calculateBlockRate'
@@ -17,7 +17,9 @@ import './polyfills/rpc-issues'
 dayjs.extend(duration)
 dayjs.extend(utc)
 
-export const createEvmBatchProcessor = (config: ChainConfig) => {
+export const createEvmBatchProcessor = (config: ChainConfig, options?: {
+  fields: FieldSelection
+}) => {
   const url = config.endpoints[0] || 'http://localhost:8545'
   console.log('rpc url', url)
   const processor = new EvmBatchProcessor()
@@ -32,23 +34,24 @@ export const createEvmBatchProcessor = (config: ChainConfig) => {
     })
     .setFinalityConfirmation(10)
     .setFields({
+      ...options?.fields,
       transaction: {
         from: true,
         to: true,
         hash: true,
         gasUsed: true,
-        effectiveGasPrice: true,
-        // gas: true,
-        // gasPrice: true,
-        // value: true,
-        // sighash: true,
+        gas: true,
+        value: true,
+        sighash: true,
         input: true,
         status: true,
+        ...options?.fields?.transaction,
       },
       log: {
         transactionHash: true,
         topics: true,
         data: true,
+        ...options?.fields?.log,
       },
       trace: {
         callFrom: true,
@@ -57,6 +60,10 @@ export const createEvmBatchProcessor = (config: ChainConfig) => {
         callValue: true,
         callInput: true,
         createResultAddress: true,
+        suicideRefundAddress: true,
+        suicideAddress: true,
+        suicideBalance: true,
+        ...options?.fields?.trace,
       },
     })
 
