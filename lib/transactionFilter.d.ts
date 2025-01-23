@@ -3,9 +3,9 @@ export interface TransactionFilter {
     from?: string[];
     to?: string[];
     sighash?: string[];
-    logs?: string[];
-    traces?: string[];
-    stateDiffs?: string[];
+    logs?: boolean;
+    traces?: boolean;
+    stateDiffs?: boolean;
     range?: {
         from: number;
         to?: number;
