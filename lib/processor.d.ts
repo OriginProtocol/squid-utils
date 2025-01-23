@@ -1,5 +1,4 @@
 import { Chain } from 'viem';
-import { KnownArchivesEVM } from '@subsquid/archive-registry';
 import { DataHandlerContext, EvmBatchProcessor, EvmBatchProcessorFields } from '@subsquid/evm-processor';
 import { Store } from '@subsquid/typeorm-store';
 import './polyfills/rpc-issues';
@@ -28,7 +27,7 @@ export declare const createEvmBatchProcessor: (config: ChainConfig) => EvmBatchP
     };
 }>;
 export interface SquidProcessor {
-    chainId?: 1 | 42161 | 8453;
+    chainId?: keyof typeof chainConfigs;
     stateSchema?: string;
     processors: Processor[];
     postProcessors?: Processor[];
@@ -45,7 +44,7 @@ export declare const defineSquidProcessor: (p: SquidProcessor) => SquidProcessor
 export declare const defineProcessor: (p: Processor) => Processor;
 export interface ChainConfig {
     chain: Chain;
-    archive: KnownArchivesEVM;
+    gateway: string;
     endpoints: string[];
 }
 export declare const chainConfigs: {
@@ -90,7 +89,7 @@ export declare const chainConfigs: {
             formatters?: undefined;
             serializers?: import("viem").ChainSerializers<undefined, import("viem").TransactionSerializable> | undefined;
         };
-        readonly archive: "eth-mainnet";
+        readonly gateway: "https://v2.archive.subsquid.io/network/ethereum-mainnet";
         readonly endpoints: string[];
     };
     readonly 42161: {
@@ -127,7 +126,7 @@ export declare const chainConfigs: {
             formatters?: undefined;
             serializers?: import("viem").ChainSerializers<undefined, import("viem").TransactionSerializable> | undefined;
         };
-        readonly archive: "arbitrum";
+        readonly gateway: "https://v2.archive.subsquid.io/network/arbitrum-one";
         readonly endpoints: string[];
     };
     readonly 8453: {
@@ -436,7 +435,43 @@ export declare const chainConfigs: {
                 readonly transaction: typeof import("viem/chains").serializeTransactionOpStack;
             };
         };
-        readonly archive: "base-mainnet";
+        readonly gateway: "https://v2.archive.subsquid.io/network/base-mainnet";
+        readonly endpoints: string[];
+    };
+    readonly 146: {
+        readonly chain: {
+            blockExplorers: {
+                readonly default: {
+                    readonly name: "Sonic Explorer";
+                    readonly url: "https://sonicscan.org/";
+                };
+            };
+            contracts: {
+                readonly multicall3: {
+                    readonly address: "0xca11bde05977b3631167028862be2a173976ca11";
+                    readonly blockCreated: 60;
+                };
+            };
+            id: 146;
+            name: "Sonic";
+            nativeCurrency: {
+                readonly decimals: 18;
+                readonly name: "Sonic";
+                readonly symbol: "S";
+            };
+            rpcUrls: {
+                readonly default: {
+                    readonly http: readonly ["https://rpc.soniclabs.com"];
+                };
+            };
+            sourceId?: number | undefined;
+            testnet: false;
+            custom?: Record<string, unknown> | undefined;
+            fees?: import("viem").ChainFees<undefined> | undefined;
+            formatters?: undefined;
+            serializers?: import("viem").ChainSerializers<undefined, import("viem").TransactionSerializable> | undefined;
+        };
+        readonly gateway: "https://v2.archive.subsquid.io/network/sonic-mainnet";
         readonly endpoints: string[];
     };
 };
