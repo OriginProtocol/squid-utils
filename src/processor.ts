@@ -46,6 +46,7 @@ export const createEvmBatchProcessor = (config: ChainConfig, options?: {
         sighash: true,
         input: true,
         status: true,
+        effectiveGasPrice: true,
         ...options?.fields?.transaction,
       },
       log: {

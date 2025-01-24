@@ -25,7 +25,7 @@ export declare const createEvmBatchProcessor: (config: ChainConfig, options?: {
         chainId?: boolean | undefined;
         authorizationList?: boolean | undefined;
         cumulativeGasUsed?: boolean | undefined;
-        effectiveGasPrice?: boolean | undefined;
+        effectiveGasPrice: boolean;
         contractAddress?: boolean | undefined;
         type?: boolean | undefined;
         status: boolean;
