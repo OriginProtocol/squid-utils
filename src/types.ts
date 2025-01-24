@@ -12,9 +12,6 @@ export type Context = DataHandlerContext<Store, Fields> & {
   blocksWithContent: Block[]
   frequencyBlocks: Block[]
   __state: Map<string, unknown>
-  eventsHandled: Set<string>
-  isEventHandled: (log: Log) => boolean
-  markEventHandled: (log: Log) => void
 }
 export type Block = Context['blocks']['0']
 export type Log = Context['blocks']['0']['logs']['0']
