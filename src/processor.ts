@@ -176,7 +176,7 @@ export const run = async ({ fromNow, chainId = 1, stateSchema, processors, postP
   await database.disconnect()
 
   let from = [...processors, ...(postProcessors ?? [])].reduce((min, p) => (p.from && p.from < min ? p.from : min), latestHeight)
-  if (from === -1) {
+  if (from === -1 && fromNow) {
     from = Number(latestBlock.number)
   }
 
