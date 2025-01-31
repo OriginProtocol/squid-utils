@@ -13,7 +13,7 @@ import { calculateBlockRate } from './calculateBlockRate'
 import { printStats } from './processing-stats'
 
 import './polyfills/rpc-issues'
-import { Context } from './types'
+import { Block, Context } from './types'
 
 dayjs.extend(duration)
 dayjs.extend(utc)
@@ -211,6 +211,15 @@ export const run = async ({ fromNow, chainId = 1, stateSchema, processors, postP
           (b) => b.logs.length > 0 || b.traces.length > 0 || b.transactions.length > 0,
         )
         ctx.frequencyBlocks = ctx.blocks.filter((b) => frequencyTracker(ctx, b))
+        ctx.lastBlockPerDay = new Map<string, Block>()
+        for (const block of ctx.blocks) {
+          ctx.lastBlockPerDay.set(new Date(block.header.timestamp).toISOString().slice(0, 10), block)
+        }
+        ctx.latestBlockOfDay = (block: Block) => {
+          const date = new Date(block.header.timestamp).toISOString().slice(0, 10)
+          return ctx.lastBlockPerDay.get(date) === block || ctx.blocks.at(-1) === block
+        }
+
 
         let start: number
         const time = (name: string) => () => {

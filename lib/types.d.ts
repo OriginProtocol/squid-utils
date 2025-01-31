@@ -7,6 +7,8 @@ export type Context = DataHandlerContext<Store, Fields> & {
     chain: Chain;
     blockRate: number;
     blocksWithContent: Block[];
+    lastBlockPerDay: Map<string, Block>;
+    latestBlockOfDay: (block: Block) => boolean;
     frequencyBlocks: Block[];
     __state: Map<string, unknown>;
 };
