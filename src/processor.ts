@@ -4,7 +4,7 @@ import duration from 'dayjs/plugin/duration'
 import utc from 'dayjs/plugin/utc'
 import { compact } from 'lodash'
 import { Chain, createPublicClient, http } from 'viem'
-import { arbitrum, base, mainnet, sonic } from 'viem/chains'
+import { arbitrum, base, mainnet, optimism, sonic } from 'viem/chains'
 
 import { EvmBatchProcessor, FieldSelection } from '@subsquid/evm-processor'
 import { TypeormDatabase } from '@subsquid/typeorm-store'
@@ -141,6 +141,14 @@ export const chainConfigs = {
       process.env[process.env.RPC_SONIC_ENV_BACKUP ?? 'RPC_SONIC_HTTP'],
     ]),
   },
+  [optimism.id]: {
+    chain: optimism,
+    gateway: 'https://v2.archive.subsquid.io/network/optimism-mainnet',
+    endpoints: compact([
+      process.env[process.env.RPC_OPTIMISM_ENV ?? 'RPC_OPTIMISM_ENDPOINT'],
+      process.env[process.env.RPC_OPTIMISM_ENV_BACKUP ?? 'RPC_OPTIMISM_HTTP'],
+    ]),
+  },
 } as const
 
 export const run = async ({ fromNow, chainId = 1, stateSchema, processors, postProcessors, validators, postValidation }: SquidProcessor) => {
@@ -155,7 +163,7 @@ export const run = async ({ fromNow, chainId = 1, stateSchema, processors, postP
     postProcessors = postProcessors?.filter((p) => p.name?.includes(process.env.PROCESSOR!))
   }
 
-  console.log('Processors:\n  - ', processors.map((p) => p.name).join('\n  - '))
+  console.log('Processors:\n  -', processors.map((p) => p.name).join('\n  - '))
 
   const config = chainConfigs[chainId]
   if (!config) throw new Error('No chain configuration found.')
