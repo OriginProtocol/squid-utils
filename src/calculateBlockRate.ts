@@ -1,4 +1,4 @@
-import { arbitrum, base, mainnet, optimism, sonic } from 'viem/chains'
+import { arbitrum, base, bsc, mainnet, optimism, sonic } from 'viem/chains'
 
 import { Context } from './types'
 
@@ -8,6 +8,7 @@ const blockRates: Record<number, number> = {
   [base.id]: 2,
   [sonic.id]: 0.6,
   [optimism.id]: 2,
+  [bsc.id]: 3,
 }
 
 export const calculateBlockRate = async (ctx: Context) => {

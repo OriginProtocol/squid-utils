@@ -4,7 +4,7 @@ import duration from 'dayjs/plugin/duration'
 import utc from 'dayjs/plugin/utc'
 import { compact } from 'lodash'
 import { Chain, createPublicClient, http } from 'viem'
-import { arbitrum, base, mainnet, optimism, sonic } from 'viem/chains'
+import { arbitrum, base, bsc, mainnet, optimism, sonic } from 'viem/chains'
 
 import { EvmBatchProcessor, FieldSelection } from '@subsquid/evm-processor'
 import { TypeormDatabase } from '@subsquid/typeorm-store'
@@ -147,6 +147,14 @@ export const chainConfigs = {
     endpoints: compact([
       process.env[process.env.RPC_OPTIMISM_ENV ?? 'RPC_OPTIMISM_ENDPOINT'],
       process.env[process.env.RPC_OPTIMISM_ENV_BACKUP ?? 'RPC_OPTIMISM_HTTP'],
+    ]),
+  },
+  [bsc.id]: {
+    chain: bsc,
+    gateway: 'https://v2.archive.subsquid.io/network/bsc-mainnet',
+    endpoints: compact([
+      process.env[process.env.RPC_BSC_ENV ?? 'RPC_BSC_ENDPOINT'],
+      process.env[process.env.RPC_BSC_ENV_BACKUP ?? 'RPC_BSC_HTTP'],
     ]),
   },
 } as const
