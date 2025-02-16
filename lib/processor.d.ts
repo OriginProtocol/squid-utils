@@ -886,7 +886,7 @@ export declare const chainConfigs: {
             formatters?: undefined;
             serializers?: import("viem").ChainSerializers<undefined, import("viem").TransactionSerializable> | undefined;
         };
-        readonly gateway: "https://v2.archive.subsquid.io/network/bsc-mainnet";
+        readonly gateway: "https://v2.archive.subsquid.io/network/binance-mainnet";
         readonly endpoints: string[];
     };
 };

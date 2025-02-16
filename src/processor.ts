@@ -151,7 +151,7 @@ export const chainConfigs = {
   },
   [bsc.id]: {
     chain: bsc,
-    gateway: 'https://v2.archive.subsquid.io/network/bsc-mainnet',
+    gateway: 'https://v2.archive.subsquid.io/network/binance-mainnet',
     endpoints: compact([
       process.env[process.env.RPC_BSC_ENV ?? 'RPC_BSC_ENDPOINT'],
       process.env[process.env.RPC_BSC_ENV_BACKUP ?? 'RPC_BSC_HTTP'],
