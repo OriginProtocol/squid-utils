@@ -215,14 +215,12 @@ export const run = async ({ fromNow, chainId = 1, stateSchema, processors, postP
     }),
     async (_ctx) => {
       const ctx = _ctx as Context
-      if (!ctx.isHead && Date.now() - contextTime > 5000) {
-        ctx.log.info(`===== !! Slow Context !! ===== (${Date.now() - contextTime}ms)`)
-      }
       try {
         ctx.chain = config.chain
         ctx.__state = new Map<string, unknown>()
         if (ctx.blocks.length >= 1) {
           ctx.blockRate = await calculateBlockRate(ctx)
+          ctx.log.info(`Block rate: ${ctx.blockRate}`)
         }
         ctx.blocksWithContent = ctx.blocks.filter(
           (b) => b.logs.length > 0 || b.traces.length > 0 || b.transactions.length > 0,
