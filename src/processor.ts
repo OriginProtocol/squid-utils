@@ -206,6 +206,7 @@ export const run = async ({ fromNow, chainId = 1, stateSchema, processors, postP
   postProcessors?.forEach((p) => p.setup?.(evmBatchProcessor, config.chain))
   const frequencyTracker = blockFrequencyTracker({ from })
   let contextTime = Date.now()
+  const averageTimeMap = new Map<string, [number, number]>()
   evmBatchProcessor.run(
     new TypeormDatabase({
       stateSchema,
@@ -239,7 +240,11 @@ export const run = async ({ fromNow, chainId = 1, stateSchema, processors, postP
 
         let start: number
         const time = (name: string) => () => {
-          const message = `${name} ${Date.now() - start}ms`
+          const timedata = averageTimeMap.get(name) ?? [0, 0]
+          timedata[0] += Date.now() - start
+          timedata[1] += 1
+          averageTimeMap.set(name, timedata)
+          const message = `${name} ${timedata[1]}x avg ${(timedata[0] / timedata[1]).toFixed(0)}ms`
           return () => ctx.log.info(message)
         }
 
