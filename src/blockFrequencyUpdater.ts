@@ -21,7 +21,7 @@ const oneDayAgo = dayjs.utc().subtract(1, 'day').valueOf()
 const oneHourAgo = dayjs.utc().subtract(1, 'hour').valueOf()
 const fifteenMinutesAgo = dayjs.utc().subtract(15, 'minutes').valueOf()
 
-const getFrequency = (blockRate: number, timestamp: number) => {
+const getFrequency = (blockRate: number, timestamp: number, minimumFrequency: number = SECONDS_PER_MINUTE) => {
   if (timestamp < oneYearAgo) {
     return (SECONDS_PER_WEEK / blockRate) ^ 0 // Older than one year ago
   } else if (timestamp < oneMonthAgo) {
@@ -35,14 +35,17 @@ const getFrequency = (blockRate: number, timestamp: number) => {
   } else if (timestamp < fifteenMinutesAgo) {
     return ((SECONDS_PER_MINUTE * 5) / blockRate) ^ 0 // Older than 15 minutes ago
   } else {
-    return (SECONDS_PER_MINUTE / blockRate) ^ 0
+    return (minimumFrequency / blockRate) ^ 0
   }
 }
 
-export const blockFrequencyTracker = (params: { from: number }) => {
+export const blockFrequencyTracker = (params: {
+  from: number
+  minimumFrequency?: number
+}) => {
   return (ctx: Context, block: Block) => {
     if (block.header.height < params.from) return
-    const frequency = getFrequency(ctx.blockRate, block.header.timestamp)
+    const frequency = getFrequency(ctx.blockRate, block.header.timestamp, params.minimumFrequency)
     return (
       // If our chain is Tenderly, we want to process all blocks.
       // The frequency logic gets messed up on Tenderly forks.
@@ -55,7 +58,11 @@ export const blockFrequencyTracker = (params: { from: number }) => {
   }
 }
 
-export const blockFrequencyUpdater = (params: { from: number; parallelProcessing?: boolean }) => {
+export const blockFrequencyUpdater = (params: {
+  from: number
+  parallelProcessing?: boolean
+  minimumFrequency?: number
+}) => {
   const parallelLimit = 10
   const tracker = blockFrequencyTracker(params)
   return async (ctx: Context, fn: (ctx: Context, block: Block) => Promise<void>) => {
