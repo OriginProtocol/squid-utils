@@ -33,5 +33,5 @@ export const calculateBlockRate = async (ctx: Context) => {
     lastContextBlock = latestBlock.header
   }
 
-  return blockRateResult
+  return blockRateResult || 1
 }

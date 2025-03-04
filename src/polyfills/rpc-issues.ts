@@ -21,6 +21,7 @@ RpcClient.prototype.call = async function <T = any>(
   // fs.writeFileSync(`rpcResponse${count}-in.json`, JSON.stringify({ method, params, options }, null, 2))
   // fs.writeFileSync(`rpcResponse${count++}.json`, JSON.stringify(response, null, 2))
   processingStats.rpcCallTime += Date.now() - time
+  processingStats.rpcCallTypes.set(method, (processingStats.rpcCallTypes.get(method) ?? 0) + 1)
   return response
 }
 RpcClient.prototype.batchCall = async function <T = any>(batch: RpcCall[], options?: CallOptions<T>): Promise<T[]> {
@@ -35,6 +36,7 @@ RpcClient.prototype.batchCall = async function <T = any>(batch: RpcCall[], optio
   // fs.writeFileSync(`rpcResponse$${count}-in.json`, JSON.stringify({ batch, options }, null, 2))
   // fs.writeFileSync(`rpcResponse$${count++}.json`, JSON.stringify(response, null, 2))
   processingStats.rpcCallTime += Date.now() - time
+  processingStats.rpcCallTypes.set(batch[0].method, (processingStats.rpcCallTypes.get(batch[0].method) ?? 0) + batch.length)
   return response
 }
 

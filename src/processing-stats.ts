@@ -3,6 +3,7 @@ import { Context } from './types'
 export const processingStats = {
   rpcCalls: 0,
   rpcCallTime: 0,
+  rpcCallTypes: new Map<string, number>(),
 }
 
 export const printStats = (ctx: Context) => {
@@ -20,4 +21,5 @@ export const printStats = (ctx: Context) => {
   }
   processingStats.rpcCalls = 0
   processingStats.rpcCallTime = 0
+  processingStats.rpcCallTypes.clear()
 }
