@@ -45,8 +45,8 @@ export declare const createEvmBatchProcessor: (config: ChainConfig, options?: {
     };
     trace: {
         subtraces?: boolean | undefined;
-        error?: boolean | undefined;
-        revertReason?: boolean | undefined;
+        error: boolean;
+        revertReason: boolean;
         createFrom?: boolean | undefined;
         createGas?: boolean | undefined;
         createValue?: boolean | undefined;

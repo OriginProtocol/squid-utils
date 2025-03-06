@@ -65,6 +65,8 @@ export const createEvmBatchProcessor = (config: ChainConfig, options?: {
         suicideRefundAddress: true,
         suicideAddress: true,
         suicideBalance: true,
+        error: true,
+        revertReason: true,
         ...options?.fields?.trace,
       },
     })
