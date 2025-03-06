@@ -8,6 +8,8 @@ type TraceFilterParams = {
     suicideRefundAddress?: string[];
     transaction?: boolean;
     transactionLogs?: boolean;
+    subtraces?: boolean;
+    parents?: boolean;
     range?: {
         from: number;
         to?: number;

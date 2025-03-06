@@ -10,6 +10,8 @@ type TraceFilterParams = {
   suicideRefundAddress?: string[]
   transaction?: boolean
   transactionLogs?: boolean
+  subtraces?: boolean
+  parents?: boolean
   range?: { from: number; to?: number }
   error?: boolean
 }
@@ -28,6 +30,9 @@ export const traceFilter = (filter: TraceFilterParams) => {
     callSighash: filter.callSighash?.map(lower),
     suicideRefundAddress: filter.suicideRefundAddress?.map(lower),
     transaction: filter.transaction ?? true,
+    transactionLogs: filter.transactionLogs ?? undefined,
+    subtraces: filter.subtraces ?? undefined,
+    parents: filter.parents ?? undefined,
     range: filter.range,
   }
   return {
