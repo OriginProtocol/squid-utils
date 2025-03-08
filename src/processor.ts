@@ -140,7 +140,7 @@ export const chainConfigs = {
     gateway: 'https://v2.archive.subsquid.io/network/sonic-mainnet',
     endpoints: compact([
       process.env[process.env.RPC_SONIC_ENV ?? 'RPC_SONIC_ENDPOINT'],
-      process.env[process.env.RPC_SONIC_ENV_BACKUP ?? 'RPC_SONIC_HTTP'],
+      process.env[process.env.RPC_SONIC_ENV_BACKUP ?? 'RPC_SONIC_MAINNET_HTTP'],
     ]),
   },
   [optimism.id]: {
