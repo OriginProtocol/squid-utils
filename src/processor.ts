@@ -101,6 +101,24 @@ export interface Processor {
 
 export const defineSquidProcessor = (p: SquidProcessor) => p
 export const defineProcessor = (p: Processor) => p
+export const joinProcessors = (name: string, processors: Processor[]): Processor => {
+  return {
+    name,
+    from: processors.reduce(
+      (min, p) => (p.from != null && (min == null || p.from < min)) ? p.from : min,
+      undefined as number | undefined
+    ),
+    initialize: async (ctx: Context) => {
+      await Promise.all(processors.map(p => p.initialize?.(ctx)))
+    },
+    setup: (evmBatchProcessor: ReturnType<typeof createEvmBatchProcessor>, chain?: Chain) => {
+      processors.forEach(p => p.setup?.(evmBatchProcessor, chain))
+    },
+    process: async (ctx: Context) => {
+      await Promise.all(processors.map(p => p.process(ctx)))
+    }
+  };
+};
 
 let initialized = false
 

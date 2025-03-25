@@ -113,6 +113,7 @@ export interface Processor {
 }
 export declare const defineSquidProcessor: (p: SquidProcessor) => SquidProcessor;
 export declare const defineProcessor: (p: Processor) => Processor;
+export declare const joinProcessors: (name: string, processors: Processor[]) => Processor;
 export interface ChainConfig {
     chain: Chain;
     gateway: string;
