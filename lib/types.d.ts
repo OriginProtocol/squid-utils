@@ -2,7 +2,8 @@ import { Chain } from 'viem';
 import { DataHandlerContext, EvmBatchProcessorFields } from '@subsquid/evm-processor';
 import { Store } from '@subsquid/typeorm-store';
 import { createEvmBatchProcessor } from './processor';
-export type Fields = EvmBatchProcessorFields<ReturnType<typeof createEvmBatchProcessor>>;
+export type EvmBatchProcessor = ReturnType<typeof createEvmBatchProcessor>;
+export type Fields = EvmBatchProcessorFields<EvmBatchProcessor>;
 export type Context = DataHandlerContext<Store, Fields> & {
     chain: Chain;
     blockRate: number;
