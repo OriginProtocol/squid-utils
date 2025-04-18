@@ -142,6 +142,7 @@ export declare const chainConfigs: {
                     readonly blockCreated: 14353601;
                 };
             };
+            ensTlds?: readonly string[] | undefined;
             id: 1;
             name: "Ethereum";
             nativeCurrency: {
@@ -151,11 +152,11 @@ export declare const chainConfigs: {
             };
             rpcUrls: {
                 readonly default: {
-                    readonly http: readonly ["https://cloudflare-eth.com"];
+                    readonly http: readonly ["https://eth.merkle.io"];
                 };
             };
-            sourceId?: number | undefined;
-            testnet?: boolean | undefined;
+            sourceId?: number | undefined | undefined;
+            testnet?: boolean | undefined | undefined;
             custom?: Record<string, unknown> | undefined;
             fees?: import("viem").ChainFees<undefined> | undefined;
             formatters?: undefined;
@@ -179,6 +180,7 @@ export declare const chainConfigs: {
                     readonly blockCreated: 7654707;
                 };
             };
+            ensTlds?: readonly string[] | undefined;
             id: 42161;
             name: "Arbitrum One";
             nativeCurrency: {
@@ -191,8 +193,8 @@ export declare const chainConfigs: {
                     readonly http: readonly ["https://arb1.arbitrum.io/rpc"];
                 };
             };
-            sourceId?: number | undefined;
-            testnet?: boolean | undefined;
+            sourceId?: number | undefined | undefined;
+            testnet?: boolean | undefined | undefined;
             custom?: Record<string, unknown> | undefined;
             fees?: import("viem").ChainFees<undefined> | undefined;
             formatters?: undefined;
@@ -256,6 +258,7 @@ export declare const chainConfigs: {
                     readonly address: "0x4200000000000000000000000000000000000016";
                 };
             };
+            ensTlds?: readonly string[] | undefined;
             id: 8453;
             name: "Base";
             nativeCurrency: {
@@ -269,7 +272,7 @@ export declare const chainConfigs: {
                 };
             };
             sourceId: 1;
-            testnet?: boolean | undefined;
+            testnet?: boolean | undefined | undefined;
             custom?: Record<string, unknown> | undefined;
             fees?: import("viem").ChainFees<undefined> | undefined;
             formatters: {
@@ -289,7 +292,7 @@ export declare const chainConfigs: {
                         mixHash: import("viem").Hash;
                         nonce: `0x${string}` | null;
                         number: bigint | null;
-                        parentBeaconBlockRoot?: import("viem").Hex | undefined;
+                        parentBeaconBlockRoot?: `0x${string}` | undefined;
                         parentHash: import("viem").Hash;
                         receiptsRoot: import("viem").Hex;
                         sealFields: import("viem").Hex[];
@@ -301,8 +304,8 @@ export declare const chainConfigs: {
                         transactions: `0x${string}`[] | import("viem/chains").OpStackTransaction<boolean>[];
                         transactionsRoot: import("viem").Hash;
                         uncles: import("viem").Hash[];
-                        withdrawals?: import("viem").Withdrawal[] | undefined;
-                        withdrawalsRoot?: import("viem").Hex | undefined;
+                        withdrawals?: import("viem").Withdrawal[] | undefined | undefined;
+                        withdrawalsRoot?: `0x${string}` | undefined;
                     } & {};
                     type: "block";
                 };
@@ -324,12 +327,12 @@ export declare const chainConfigs: {
                         v: bigint;
                         value: bigint;
                         yParity: number;
-                        gasPrice?: undefined;
-                        maxFeePerBlobGas?: undefined;
+                        gasPrice?: undefined | undefined;
+                        maxFeePerBlobGas?: undefined | undefined;
                         maxFeePerGas: bigint;
                         maxPriorityFeePerGas: bigint;
                         isSystemTx?: boolean;
-                        mint?: bigint | undefined;
+                        mint?: bigint | undefined | undefined;
                         sourceHash: import("viem").Hex;
                         type: "deposit";
                     } | {
@@ -347,19 +350,19 @@ export declare const chainConfigs: {
                         input: import("viem").Hex;
                         transactionIndex: number | null;
                         typeHex: import("viem").Hex | null;
-                        accessList?: undefined;
-                        authorizationList?: undefined;
-                        blobVersionedHashes?: undefined;
+                        accessList?: undefined | undefined;
+                        authorizationList?: undefined | undefined;
+                        blobVersionedHashes?: undefined | undefined;
                         chainId?: number | undefined;
-                        yParity?: undefined;
+                        yParity?: undefined | undefined;
                         type: "legacy";
                         gasPrice: bigint;
-                        maxFeePerBlobGas?: undefined;
-                        maxFeePerGas?: undefined;
-                        maxPriorityFeePerGas?: undefined;
-                        isSystemTx?: undefined;
-                        mint?: undefined;
-                        sourceHash?: undefined;
+                        maxFeePerBlobGas?: undefined | undefined;
+                        maxFeePerGas?: undefined | undefined;
+                        maxPriorityFeePerGas?: undefined | undefined;
+                        isSystemTx?: undefined | undefined;
+                        mint?: undefined | undefined;
+                        sourceHash?: undefined | undefined;
                     } | {
                         blockHash: `0x${string}` | null;
                         blockNumber: bigint | null;
@@ -377,17 +380,17 @@ export declare const chainConfigs: {
                         value: bigint;
                         yParity: number;
                         accessList: import("viem").AccessList;
-                        authorizationList?: undefined;
-                        blobVersionedHashes?: undefined;
+                        authorizationList?: undefined | undefined;
+                        blobVersionedHashes?: undefined | undefined;
                         chainId: number;
                         type: "eip2930";
                         gasPrice: bigint;
-                        maxFeePerBlobGas?: undefined;
-                        maxFeePerGas?: undefined;
-                        maxPriorityFeePerGas?: undefined;
-                        isSystemTx?: undefined;
-                        mint?: undefined;
-                        sourceHash?: undefined;
+                        maxFeePerBlobGas?: undefined | undefined;
+                        maxFeePerGas?: undefined | undefined;
+                        maxPriorityFeePerGas?: undefined | undefined;
+                        isSystemTx?: undefined | undefined;
+                        mint?: undefined | undefined;
+                        sourceHash?: undefined | undefined;
                     } | {
                         blockHash: `0x${string}` | null;
                         blockNumber: bigint | null;
@@ -405,17 +408,17 @@ export declare const chainConfigs: {
                         value: bigint;
                         yParity: number;
                         accessList: import("viem").AccessList;
-                        authorizationList?: undefined;
-                        blobVersionedHashes?: undefined;
+                        authorizationList?: undefined | undefined;
+                        blobVersionedHashes?: undefined | undefined;
                         chainId: number;
                         type: "eip1559";
-                        gasPrice?: undefined;
-                        maxFeePerBlobGas?: undefined;
+                        gasPrice?: undefined | undefined;
+                        maxFeePerBlobGas?: undefined | undefined;
                         maxFeePerGas: bigint;
                         maxPriorityFeePerGas: bigint;
-                        isSystemTx?: undefined;
-                        mint?: undefined;
-                        sourceHash?: undefined;
+                        isSystemTx?: undefined | undefined;
+                        mint?: undefined | undefined;
+                        sourceHash?: undefined | undefined;
                     } | {
                         blockHash: `0x${string}` | null;
                         blockNumber: bigint | null;
@@ -433,17 +436,17 @@ export declare const chainConfigs: {
                         value: bigint;
                         yParity: number;
                         accessList: import("viem").AccessList;
-                        authorizationList?: undefined;
+                        authorizationList?: undefined | undefined;
                         blobVersionedHashes: readonly import("viem").Hex[];
                         chainId: number;
                         type: "eip4844";
-                        gasPrice?: undefined;
+                        gasPrice?: undefined | undefined;
                         maxFeePerBlobGas: bigint;
                         maxFeePerGas: bigint;
                         maxPriorityFeePerGas: bigint;
-                        isSystemTx?: undefined;
-                        mint?: undefined;
-                        sourceHash?: undefined;
+                        isSystemTx?: undefined | undefined;
+                        mint?: undefined | undefined;
+                        sourceHash?: undefined | undefined;
                     } | {
                         blockHash: `0x${string}` | null;
                         blockNumber: bigint | null;
@@ -461,17 +464,17 @@ export declare const chainConfigs: {
                         value: bigint;
                         yParity: number;
                         accessList: import("viem").AccessList;
-                        authorizationList: import("viem/experimental").SignedAuthorizationList;
-                        blobVersionedHashes?: undefined;
+                        authorizationList: import("viem").SignedAuthorizationList;
+                        blobVersionedHashes?: undefined | undefined;
                         chainId: number;
                         type: "eip7702";
-                        gasPrice?: undefined;
-                        maxFeePerBlobGas?: undefined;
+                        gasPrice?: undefined | undefined;
+                        maxFeePerBlobGas?: undefined | undefined;
                         maxFeePerGas: bigint;
                         maxPriorityFeePerGas: bigint;
-                        isSystemTx?: undefined;
-                        mint?: undefined;
-                        sourceHash?: undefined;
+                        isSystemTx?: undefined | undefined;
+                        mint?: undefined | undefined;
+                        sourceHash?: undefined | undefined;
                     }) & {};
                     type: "transaction";
                 };
@@ -489,7 +492,7 @@ export declare const chainConfigs: {
                         gasUsed: bigint;
                         logs: import("viem").Log<bigint, number, false>[];
                         logsBloom: import("viem").Hex;
-                        root?: import("viem").Hash | undefined;
+                        root?: `0x${string}` | undefined;
                         status: "success" | "reverted";
                         to: import("viem").Address | null;
                         transactionHash: import("viem").Hash;
@@ -515,7 +518,7 @@ export declare const chainConfigs: {
             blockExplorers: {
                 readonly default: {
                     readonly name: "Sonic Explorer";
-                    readonly url: "https://sonicscan.org/";
+                    readonly url: "https://sonicscan.org";
                 };
             };
             contracts: {
@@ -524,6 +527,7 @@ export declare const chainConfigs: {
                     readonly blockCreated: 60;
                 };
             };
+            ensTlds?: readonly string[] | undefined;
             id: 146;
             name: "Sonic";
             nativeCurrency: {
@@ -536,7 +540,7 @@ export declare const chainConfigs: {
                     readonly http: readonly ["https://rpc.soniclabs.com"];
                 };
             };
-            sourceId?: number | undefined;
+            sourceId?: number | undefined | undefined;
             testnet: false;
             custom?: Record<string, unknown> | undefined;
             fees?: import("viem").ChainFees<undefined> | undefined;
@@ -599,6 +603,7 @@ export declare const chainConfigs: {
                     readonly address: "0x4200000000000000000000000000000000000016";
                 };
             };
+            ensTlds?: readonly string[] | undefined;
             id: 10;
             name: "OP Mainnet";
             nativeCurrency: {
@@ -612,7 +617,7 @@ export declare const chainConfigs: {
                 };
             };
             sourceId: 1;
-            testnet?: boolean | undefined;
+            testnet?: boolean | undefined | undefined;
             custom?: Record<string, unknown> | undefined;
             fees?: import("viem").ChainFees<undefined> | undefined;
             formatters: {
@@ -632,7 +637,7 @@ export declare const chainConfigs: {
                         mixHash: import("viem").Hash;
                         nonce: `0x${string}` | null;
                         number: bigint | null;
-                        parentBeaconBlockRoot?: import("viem").Hex | undefined;
+                        parentBeaconBlockRoot?: `0x${string}` | undefined;
                         parentHash: import("viem").Hash;
                         receiptsRoot: import("viem").Hex;
                         sealFields: import("viem").Hex[];
@@ -644,8 +649,8 @@ export declare const chainConfigs: {
                         transactions: `0x${string}`[] | import("viem/chains").OpStackTransaction<boolean>[];
                         transactionsRoot: import("viem").Hash;
                         uncles: import("viem").Hash[];
-                        withdrawals?: import("viem").Withdrawal[] | undefined;
-                        withdrawalsRoot?: import("viem").Hex | undefined;
+                        withdrawals?: import("viem").Withdrawal[] | undefined | undefined;
+                        withdrawalsRoot?: `0x${string}` | undefined;
                     } & {};
                     type: "block";
                 };
@@ -667,12 +672,12 @@ export declare const chainConfigs: {
                         v: bigint;
                         value: bigint;
                         yParity: number;
-                        gasPrice?: undefined;
-                        maxFeePerBlobGas?: undefined;
+                        gasPrice?: undefined | undefined;
+                        maxFeePerBlobGas?: undefined | undefined;
                         maxFeePerGas: bigint;
                         maxPriorityFeePerGas: bigint;
                         isSystemTx?: boolean;
-                        mint?: bigint | undefined;
+                        mint?: bigint | undefined | undefined;
                         sourceHash: import("viem").Hex;
                         type: "deposit";
                     } | {
@@ -690,19 +695,19 @@ export declare const chainConfigs: {
                         input: import("viem").Hex;
                         transactionIndex: number | null;
                         typeHex: import("viem").Hex | null;
-                        accessList?: undefined;
-                        authorizationList?: undefined;
-                        blobVersionedHashes?: undefined;
+                        accessList?: undefined | undefined;
+                        authorizationList?: undefined | undefined;
+                        blobVersionedHashes?: undefined | undefined;
                         chainId?: number | undefined;
-                        yParity?: undefined;
+                        yParity?: undefined | undefined;
                         type: "legacy";
                         gasPrice: bigint;
-                        maxFeePerBlobGas?: undefined;
-                        maxFeePerGas?: undefined;
-                        maxPriorityFeePerGas?: undefined;
-                        isSystemTx?: undefined;
-                        mint?: undefined;
-                        sourceHash?: undefined;
+                        maxFeePerBlobGas?: undefined | undefined;
+                        maxFeePerGas?: undefined | undefined;
+                        maxPriorityFeePerGas?: undefined | undefined;
+                        isSystemTx?: undefined | undefined;
+                        mint?: undefined | undefined;
+                        sourceHash?: undefined | undefined;
                     } | {
                         blockHash: `0x${string}` | null;
                         blockNumber: bigint | null;
@@ -720,17 +725,17 @@ export declare const chainConfigs: {
                         value: bigint;
                         yParity: number;
                         accessList: import("viem").AccessList;
-                        authorizationList?: undefined;
-                        blobVersionedHashes?: undefined;
+                        authorizationList?: undefined | undefined;
+                        blobVersionedHashes?: undefined | undefined;
                         chainId: number;
                         type: "eip2930";
                         gasPrice: bigint;
-                        maxFeePerBlobGas?: undefined;
-                        maxFeePerGas?: undefined;
-                        maxPriorityFeePerGas?: undefined;
-                        isSystemTx?: undefined;
-                        mint?: undefined;
-                        sourceHash?: undefined;
+                        maxFeePerBlobGas?: undefined | undefined;
+                        maxFeePerGas?: undefined | undefined;
+                        maxPriorityFeePerGas?: undefined | undefined;
+                        isSystemTx?: undefined | undefined;
+                        mint?: undefined | undefined;
+                        sourceHash?: undefined | undefined;
                     } | {
                         blockHash: `0x${string}` | null;
                         blockNumber: bigint | null;
@@ -748,17 +753,17 @@ export declare const chainConfigs: {
                         value: bigint;
                         yParity: number;
                         accessList: import("viem").AccessList;
-                        authorizationList?: undefined;
-                        blobVersionedHashes?: undefined;
+                        authorizationList?: undefined | undefined;
+                        blobVersionedHashes?: undefined | undefined;
                         chainId: number;
                         type: "eip1559";
-                        gasPrice?: undefined;
-                        maxFeePerBlobGas?: undefined;
+                        gasPrice?: undefined | undefined;
+                        maxFeePerBlobGas?: undefined | undefined;
                         maxFeePerGas: bigint;
                         maxPriorityFeePerGas: bigint;
-                        isSystemTx?: undefined;
-                        mint?: undefined;
-                        sourceHash?: undefined;
+                        isSystemTx?: undefined | undefined;
+                        mint?: undefined | undefined;
+                        sourceHash?: undefined | undefined;
                     } | {
                         blockHash: `0x${string}` | null;
                         blockNumber: bigint | null;
@@ -776,17 +781,17 @@ export declare const chainConfigs: {
                         value: bigint;
                         yParity: number;
                         accessList: import("viem").AccessList;
-                        authorizationList?: undefined;
+                        authorizationList?: undefined | undefined;
                         blobVersionedHashes: readonly import("viem").Hex[];
                         chainId: number;
                         type: "eip4844";
-                        gasPrice?: undefined;
+                        gasPrice?: undefined | undefined;
                         maxFeePerBlobGas: bigint;
                         maxFeePerGas: bigint;
                         maxPriorityFeePerGas: bigint;
-                        isSystemTx?: undefined;
-                        mint?: undefined;
-                        sourceHash?: undefined;
+                        isSystemTx?: undefined | undefined;
+                        mint?: undefined | undefined;
+                        sourceHash?: undefined | undefined;
                     } | {
                         blockHash: `0x${string}` | null;
                         blockNumber: bigint | null;
@@ -804,17 +809,17 @@ export declare const chainConfigs: {
                         value: bigint;
                         yParity: number;
                         accessList: import("viem").AccessList;
-                        authorizationList: import("viem/experimental").SignedAuthorizationList;
-                        blobVersionedHashes?: undefined;
+                        authorizationList: import("viem").SignedAuthorizationList;
+                        blobVersionedHashes?: undefined | undefined;
                         chainId: number;
                         type: "eip7702";
-                        gasPrice?: undefined;
-                        maxFeePerBlobGas?: undefined;
+                        gasPrice?: undefined | undefined;
+                        maxFeePerBlobGas?: undefined | undefined;
                         maxFeePerGas: bigint;
                         maxPriorityFeePerGas: bigint;
-                        isSystemTx?: undefined;
-                        mint?: undefined;
-                        sourceHash?: undefined;
+                        isSystemTx?: undefined | undefined;
+                        mint?: undefined | undefined;
+                        sourceHash?: undefined | undefined;
                     }) & {};
                     type: "transaction";
                 };
@@ -832,7 +837,7 @@ export declare const chainConfigs: {
                         gasUsed: bigint;
                         logs: import("viem").Log<bigint, number, false>[];
                         logsBloom: import("viem").Hex;
-                        root?: import("viem").Hash | undefined;
+                        root?: `0x${string}` | undefined;
                         status: "success" | "reverted";
                         to: import("viem").Address | null;
                         transactionHash: import("viem").Hash;
@@ -868,6 +873,7 @@ export declare const chainConfigs: {
                     readonly blockCreated: 15921452;
                 };
             };
+            ensTlds?: readonly string[] | undefined;
             id: 56;
             name: "BNB Smart Chain";
             nativeCurrency: {
@@ -877,17 +883,56 @@ export declare const chainConfigs: {
             };
             rpcUrls: {
                 readonly default: {
-                    readonly http: readonly ["https://rpc.ankr.com/bsc"];
+                    readonly http: readonly ["https://56.rpc.thirdweb.com"];
                 };
             };
-            sourceId?: number | undefined;
-            testnet?: boolean | undefined;
+            sourceId?: number | undefined | undefined;
+            testnet?: boolean | undefined | undefined;
             custom?: Record<string, unknown> | undefined;
             fees?: import("viem").ChainFees<undefined> | undefined;
             formatters?: undefined;
             serializers?: import("viem").ChainSerializers<undefined, import("viem").TransactionSerializable> | undefined;
         };
         readonly gateway: "https://v2.archive.subsquid.io/network/binance-mainnet";
+        readonly endpoints: string[];
+    };
+    readonly 98866: {
+        readonly chain: {
+            blockExplorers: {
+                readonly default: {
+                    readonly name: "Blockscout";
+                    readonly url: "https://phoenix-explorer.plumenetwork.xyz";
+                    readonly apiUrl: "https://phoenix-explorer.plumenetwork.xyz/api";
+                };
+            };
+            contracts: {
+                readonly multicall3: {
+                    readonly address: "0xcA11bde05977b3631167028862bE2a173976CA11";
+                    readonly blockCreated: 39679;
+                };
+            };
+            ensTlds?: readonly string[] | undefined;
+            id: 98866;
+            name: "Plume";
+            nativeCurrency: {
+                readonly name: "Plume";
+                readonly symbol: "PLUME";
+                readonly decimals: 18;
+            };
+            rpcUrls: {
+                readonly default: {
+                    readonly http: readonly ["https://phoenix-rpc.plumenetwork.xyz"];
+                    readonly webSocket: readonly ["wss://phoenix-rpc.plumenetwork.xyz"];
+                };
+            };
+            sourceId: 1;
+            testnet?: boolean | undefined | undefined;
+            custom?: Record<string, unknown> | undefined;
+            fees?: import("viem").ChainFees<undefined> | undefined;
+            formatters?: undefined;
+            serializers?: import("viem").ChainSerializers<undefined, import("viem").TransactionSerializable> | undefined;
+        };
+        readonly gateway: "https://v2.archive.subsquid.io/network/plume";
         readonly endpoints: string[];
     };
 };

@@ -19,11 +19,12 @@
     "@subsquid/archive-registry": "^3.3.2",
     "@subsquid/evm-abi": "^0.3.1",
     "@subsquid/evm-codec": "^0.3.0",
-    "@subsquid/evm-processor": "^1.27.0",
+    "@subsquid/evm-processor": "^1.27.1",
     "@subsquid/typeorm-store": "^1.5.1",
     "dayjs": "^1.11.13",
     "lodash": "^4.17.21",
-    "node-fetch": "^2.7.0"
+    "node-fetch": "^2.7.0",
+    "viem": "^2.27.2"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.14",
