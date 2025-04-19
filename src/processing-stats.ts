@@ -39,9 +39,9 @@ export const printStats = (ctx: Context) => {
       }
     })
   }
-  processingStats.rpcCalls = 0
-  processingStats.rpcCallTime = 0
-  processingStats.rpcCallTypes.clear()
-  processingStats.totalCUCost = 0
-  processingStats.rpcCUCosts.clear()
+  // processingStats.rpcCalls = 0
+  // processingStats.rpcCallTime = 0
+  // processingStats.rpcCallTypes.clear()
+  // processingStats.totalCUCost = 0
+  // processingStats.rpcCUCosts.clear()
 }
