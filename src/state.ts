@@ -1,6 +1,7 @@
+import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { Context } from './types'
 
-export const cached = <I extends [Context, ...any[]], R>(
+export const cached = <I extends [Context<EvmBatchProcessor>, ...any[]], R>(
   keyFn: (...params: I) => string,
   fn: (...params: I) => Promise<R>,
 ) => {
@@ -13,7 +14,7 @@ export const cached = <I extends [Context, ...any[]], R>(
   }
 }
 
-export const useProcessorState = <T>(ctx: Context, key: string, defaultValue?: T) => {
+export const useProcessorState = <T>(ctx: Context<EvmBatchProcessor>, key: string, defaultValue?: T) => {
   const { __state } = ctx
   let value = __state.get(key) as T | undefined
   if (!value) {
@@ -33,7 +34,7 @@ export const useProcessorState = <T>(ctx: Context, key: string, defaultValue?: T
  * Use this to distribute state throughout processors one time.
  * *Not for gradual/continuous update within the context.*
  */
-export const publishProcessorState = <T>(ctx: Context, key: string, state: T) => {
+export const publishProcessorState = <T>(ctx: Context<EvmBatchProcessor>, key: string, state: T) => {
   const [, setState] = useProcessorState<T>(ctx, `waitForProcessorState:${key}`)
   const [listeners] = useProcessorState<((state: T) => void)[]>(ctx, `waitForProcessorState-listeners:${key}`, [])
   setState(state)
@@ -43,7 +44,7 @@ export const publishProcessorState = <T>(ctx: Context, key: string, state: T) =>
 /**
  * Wait for processor state to be set and retrieve it.
  */
-export const waitForProcessorState = <T>(ctx: Context, key: string) => {
+export const waitForProcessorState = <T>(ctx: Context<EvmBatchProcessor>, key: string) => {
   return new Promise<T>((resolve) => {
     const [state] = useProcessorState<T>(ctx, `waitForProcessorState:${key}`)
     if (state) resolve(state)

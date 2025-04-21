@@ -846,4 +846,8 @@ export declare const chainConfigs: {
         readonly endpoints: string[];
     };
 };
-export declare const run: (evmBatchProcessor: EvmBatchProcessor, { fromNow, chainId, stateSchema, processors, postProcessors, validators, postValidation }: SquidProcessor) => Promise<void>;
+export declare const run: <T extends EvmBatchProcessor<{
+    block: {
+        timestamp: true;
+    };
+}>>(evmBatchProcessor: T, { fromNow, chainId, stateSchema, processors, postProcessors, validators, postValidation }: SquidProcessor<T>) => Promise<void>;

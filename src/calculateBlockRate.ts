@@ -1,12 +1,12 @@
+import { EvmBatchProcessor } from '@subsquid/evm-processor';
 import { Block, Context } from './types';
-
-let lastContextBlock: Block['header'] | null = null
+let lastContextBlock: Block<EvmBatchProcessor>['header'] | null = null
 
 /**
  * Calculates the average block rate in seconds from the context blocks
  * Falls back to previous context if needed, defaults to 1 second if no data available
  */
-export const calculateBlockRate = async (ctx: Context) => {
+export const calculateBlockRate = async (ctx: Context<EvmBatchProcessor>) => {
   const latestBlock = ctx.blocks[ctx.blocks.length - 1]
 
   // Update state for next context

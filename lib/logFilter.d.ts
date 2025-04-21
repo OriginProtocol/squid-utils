@@ -1,3 +1,4 @@
+import { EvmBatchProcessor } from '@subsquid/evm-processor';
 import { Log } from './types';
 type LogFilterParams = {
     address?: string[];
@@ -18,7 +19,15 @@ type LogFilterParams = {
  */
 export declare const logFilter: (filter: LogFilterParams) => {
     readonly value: LogFilterParams;
-    readonly matches: (log: Log) => boolean;
+    readonly matches: (log: Log<EvmBatchProcessor<{
+        log: {
+            address: true;
+            topics: true;
+            block: {
+                height: true;
+            };
+        };
+    }>>) => boolean;
 };
 export type LogFilter = ReturnType<typeof logFilter>;
 export {};

@@ -1,5 +1,6 @@
 import { pad as viemPad } from 'viem'
 
+import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { Log } from './types'
 
 type LogFilterParams = {
@@ -35,7 +36,15 @@ export const logFilter = (filter: LogFilterParams) => {
   }
   return {
     value: filter,
-    matches(log: Log) {
+    matches(log: Log<EvmBatchProcessor<{
+      log: {
+        address: true
+        topics: true
+        block: {
+          height: true
+        }
+      }
+    }>>) {
       if (filter.address && !filter.address.includes(log.address)) {
         return false
       }

@@ -20,18 +20,21 @@ export type ProcessorTypes<T extends EvmBatchProcessor> = {
   Trace: DataHandlerContext<Store, EvmBatchProcessorFields<T>>['blocks'][number]['traces'][number]
 }
 
-// Helper type to extract the Block type from a processor
-export type Block<T extends EvmBatchProcessor = EvmBatchProcessor> = ProcessorTypes<T>['Block']
-// Helper type to extract the Log type from a processor
-export type Log<T extends EvmBatchProcessor = EvmBatchProcessor> = ProcessorTypes<T>['Log']
-// Helper type to extract the Transaction type from a processor
-export type Transaction<T extends EvmBatchProcessor = EvmBatchProcessor> = ProcessorTypes<T>['Transaction']
-// Helper type to extract the Trace type from a processor
-export type Trace<T extends EvmBatchProcessor = EvmBatchProcessor> = ProcessorTypes<T>['Trace']
 // Helper type to extract the Context type from a processor
-export type Context<T extends EvmBatchProcessor = EvmBatchProcessor> = ProcessorTypes<T>['Context'] 
+export type Context<T extends EvmBatchProcessor> = ProcessorTypes<T>['Context']
+export type Block<T extends EvmBatchProcessor> = ProcessorTypes<T>['Block']
+export type Log<T extends EvmBatchProcessor> = ProcessorTypes<T>['Log']
+export type Trace<T extends EvmBatchProcessor> = ProcessorTypes<T>['Trace']
+export type Transaction<T extends EvmBatchProcessor> = ProcessorTypes<T>['Transaction']
 
-export interface EvmProcessor<T extends EvmBatchProcessor = EvmBatchProcessor> {
+// Type constraint to ensure the processor has required fields
+export type ProcessorWithTimestamp<T extends EvmBatchProcessor> = T extends EvmBatchProcessor<infer F> 
+  ? F extends { block: { timestamp: true } } 
+    ? T 
+    : never 
+  : never
+
+export interface EvmProcessor<T extends EvmBatchProcessor> {
   name: string
   from?: number
   chainId: number

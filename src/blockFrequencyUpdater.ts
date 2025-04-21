@@ -3,6 +3,7 @@ import duration from 'dayjs/plugin/duration'
 import utc from 'dayjs/plugin/utc'
 import { base } from 'viem/chains'
 
+import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { Block, Context } from './types'
 
 dayjs.extend(duration)
@@ -39,11 +40,13 @@ const getFrequency = (blockRate: number, timestamp: number, minimumFrequency: nu
   }
 }
 
-export const blockFrequencyTracker = (params: {
+export const blockFrequencyTracker = <T extends EvmBatchProcessor<{ block: { timestamp: true } }>>(params: {
   from: number
   minimumFrequency?: number
 }) => {
-  return (ctx: Context, block: Block) => {
+  type ContextType = Context<EvmBatchProcessor<{ block: { timestamp: true } }>>
+  type BlockType = Block<EvmBatchProcessor<{ block: { timestamp: true } }>>
+  return (ctx: ContextType, block: BlockType) => {
     if (block.header.height < params.from) return
     const frequency = getFrequency(ctx.blockRate, block.header.timestamp, params.minimumFrequency)
     return (
@@ -65,7 +68,7 @@ export const blockFrequencyUpdater = (params: {
 }) => {
   const parallelLimit = 10
   const tracker = blockFrequencyTracker(params)
-  return async (ctx: Context, fn: (ctx: Context, block: Block) => Promise<void>) => {
+  return async (ctx: Context<EvmBatchProcessor>, fn: (ctx: Context<EvmBatchProcessor>, block: Block<EvmBatchProcessor>) => Promise<void>) => {
     if (!ctx.blocks.length) return
     if (ctx.blocks[ctx.blocks.length - 1].header.height < params.from) {
       // No applicable blocks in current context.
@@ -89,7 +92,7 @@ export const blockFrequencyUpdater = (params: {
 }
 
 // This came around so we can have good historical snapshots of data during Aerodrome epoch flips.
-export const isAerodromeImportantBlock = (ctx: Context, block: Block) => {
+export const isAerodromeImportantBlock = (ctx: Context<EvmBatchProcessor>, block: Block<EvmBatchProcessor>) => {
   if (ctx.chain.id !== base.id) return false
   if (block.header.height < 17819702) return false
   const lastBlockWeek = Math.floor((block.header.timestamp / 1000 - ctx.blockRate) / SECONDS_PER_WEEK)

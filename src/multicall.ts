@@ -2,6 +2,7 @@ import { toHex } from 'viem'
 import { arbitrum, mainnet } from 'viem/chains'
 
 import { type AbiFunction, type FunctionArguments } from '@subsquid/evm-abi'
+import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { Multicall } from './abi/multicall'
 import { Context } from './types'
 
@@ -16,7 +17,7 @@ const MULTICALL_CONTRACTS: Record<number, undefined | { from: number; address: s
   },
 }
 export const multicall = async <Function extends AbiFunction<any, any>>(
-  ctx: Context,
+  ctx: Context<EvmBatchProcessor>,
   header: { height: number },
   func: Function,
   address: string,

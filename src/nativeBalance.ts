@@ -1,11 +1,12 @@
 import { hexToBigInt } from 'viem'
 
+import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { Context } from './types'
 
 export const getNativeBalance = async (
-  ctx: Context,
+  ctx: Context<EvmBatchProcessor>,
   address: string,
-  block: Context['blocks']['0'],
+  block: Context<EvmBatchProcessor>['blocks']['0'],
 ) => {
   return await ctx._chain.client
     .call('eth_getBalance', [address, block.header.hash])
@@ -13,9 +14,9 @@ export const getNativeBalance = async (
 }
 
 export const getNativeBalances = async (
-  ctx: Context,
+  ctx: Context<EvmBatchProcessor>,
   addresses: string[],
-  block: Context['blocks']['0'],
+  block: Context<EvmBatchProcessor>['blocks']['0'],
 ) => {
   if (!addresses.length) return []
   return await ctx._chain.client

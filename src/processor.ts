@@ -13,7 +13,7 @@ import { calculateBlockRate } from './calculateBlockRate'
 import { printStats } from './processing-stats'
 
 import './polyfills/rpc-issues'
-import { Block, Context } from './types'
+import { Context } from './types'
 
 dayjs.extend(duration)
 dayjs.extend(utc)
@@ -70,13 +70,13 @@ export const joinProcessors = <T extends EvmBatchProcessor>(name: string, proces
       (min, p) => (p.from != null && (min == null || p.from < min)) ? p.from : min,
       undefined as number | undefined
     ),
-    initialize: async (ctx: Context) => {
+    initialize: async (ctx: Context<T>) => {
       await Promise.all(processors.map(p => p.initialize?.(ctx)))
     },
     setup: (evmBatchProcessor: EvmBatchProcessor, chain?: Chain) => {
       processors.forEach(p => p.setup?.(evmBatchProcessor, chain))
     },
-    process: async (ctx: Context) => {
+    process: async (ctx: Context<T>) => {
       await Promise.all(processors.map(p => p.process(ctx)))
     }
   };
@@ -149,7 +149,7 @@ export const chainConfigs = {
   },
 } as const
 
-export const run = async (evmBatchProcessor: EvmBatchProcessor, { fromNow, chainId = 1, stateSchema, processors, postProcessors, validators, postValidation }: SquidProcessor) => {
+export const run = async <T extends EvmBatchProcessor<{ block: { timestamp: true } }>>(evmBatchProcessor: T, { fromNow, chainId = 1, stateSchema, processors, postProcessors, validators, postValidation }: SquidProcessor<T>) => {
   if (!fromNow) {
     assert(!processors.find((p) => p.from === undefined), 'All processors must have a `from` defined')
   }
@@ -204,7 +204,7 @@ export const run = async (evmBatchProcessor: EvmBatchProcessor, { fromNow, chain
       isolationLevel: 'READ COMMITTED',
     }),
     async (_ctx) => {
-      const ctx = _ctx as Context
+      const ctx = _ctx as Context<EvmBatchProcessor<{ block: { timestamp: true } }>>
       try {
         ctx.chain = config.chain
         ctx.__state = new Map<string, unknown>()
@@ -216,11 +216,11 @@ export const run = async (evmBatchProcessor: EvmBatchProcessor, { fromNow, chain
           (b) => b.logs.length > 0 || b.traces.length > 0 || b.transactions.length > 0,
         )
         ctx.frequencyBlocks = ctx.blocks.filter((b) => frequencyTracker(ctx, b))
-        ctx.lastBlockPerDay = new Map<string, Block>()
+        ctx.lastBlockPerDay = new Map<string, typeof ctx.blocks[number]>()
         for (const block of ctx.blocks) {
           ctx.lastBlockPerDay.set(new Date(block.header.timestamp).toISOString().slice(0, 10), block)
         }
-        ctx.latestBlockOfDay = (block: Block) => {
+        ctx.latestBlockOfDay = (block) => {
           const date = new Date(block.header.timestamp).toISOString().slice(0, 10)
           return ctx.lastBlockPerDay.get(date) === block || ctx.blocks.at(-1) === block
         }

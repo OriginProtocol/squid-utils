@@ -1,3 +1,4 @@
+import { EvmBatchProcessor } from '@subsquid/evm-processor';
 import { Context } from './types';
 
 export const processingStats = {
@@ -8,7 +9,7 @@ export const processingStats = {
   rpcCUCosts: new Map<string, number>(),
 }
 
-export const printStats = (ctx: Context) => {
+export const printStats = (ctx: Context<EvmBatchProcessor>) => {
   if (process.env.DEBUG_PERF === 'true') {
     // Convert Maps to objects for logging
     const callTypes = Object.fromEntries(processingStats.rpcCallTypes);
