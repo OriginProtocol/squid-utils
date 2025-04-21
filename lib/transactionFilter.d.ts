@@ -1,4 +1,5 @@
-import { Transaction } from './types';
+import { EvmBatchProcessor } from '@subsquid/evm-processor';
+import { Transaction } from 'types';
 export interface TransactionFilter {
     from?: string[];
     to?: string[];
@@ -16,5 +17,9 @@ export interface TransactionFilter {
  */
 export declare const transactionFilter: (filter: TransactionFilter) => {
     readonly value: TransactionFilter;
-    readonly matches: (transaction: Transaction) => boolean;
+    readonly matches: (transaction: Transaction<EvmBatchProcessor<{
+        transaction: {
+            sighash: true;
+        };
+    }>>) => boolean;
 };

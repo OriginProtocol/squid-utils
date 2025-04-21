@@ -1,31 +1,41 @@
 import { Chain } from 'viem'
 
-import { DataHandlerContext, EvmBatchProcessorFields } from '@subsquid/evm-processor'
+import { DataHandlerContext, EvmBatchProcessor, EvmBatchProcessorFields } from '@subsquid/evm-processor'
 import { Store } from '@subsquid/typeorm-store'
 
-import { createEvmBatchProcessor } from './processor'
-
-export type EvmBatchProcessor = ReturnType<typeof createEvmBatchProcessor>
-export type Fields = EvmBatchProcessorFields<EvmBatchProcessor>
-export type Context = DataHandlerContext<Store, Fields> & {
-  chain: Chain
-  blockRate: number
-  blocksWithContent: Block[]
-  lastBlockPerDay: Map<string, Block>
-  latestBlockOfDay: (block: Block) => boolean
-  frequencyBlocks: Block[]
-  __state: Map<string, unknown>
+export type ProcessorTypes<T extends EvmBatchProcessor> = {
+  Fields: EvmBatchProcessorFields<T>
+  Context: DataHandlerContext<Store, EvmBatchProcessorFields<T>> & {
+    chain: Chain
+    blockRate: number
+    blocksWithContent: Block<T>[]
+    lastBlockPerDay: Map<string, Block<T>>
+    latestBlockOfDay: (block: Block<T>) => boolean
+    frequencyBlocks: Block<T>[]
+    __state: Map<string, unknown>
+  }
+  Block: DataHandlerContext<Store, EvmBatchProcessorFields<T>>['blocks'][number]
+  Log: DataHandlerContext<Store, EvmBatchProcessorFields<T>>['blocks'][number]['logs'][number]
+  Transaction: DataHandlerContext<Store, EvmBatchProcessorFields<T>>['blocks'][number]['transactions'][number]
+  Trace: DataHandlerContext<Store, EvmBatchProcessorFields<T>>['blocks'][number]['traces'][number]
 }
-export type Block = Context['blocks']['0']
-export type Log = Context['blocks']['0']['logs']['0']
-export type Transaction = Context['blocks']['0']['transactions']['0']
-export type Trace = Context['blocks']['0']['traces']['0']
 
-export interface EvmProcessor {
+// Helper type to extract the Block type from a processor
+export type Block<T extends EvmBatchProcessor = EvmBatchProcessor> = ProcessorTypes<T>['Block']
+// Helper type to extract the Log type from a processor
+export type Log<T extends EvmBatchProcessor = EvmBatchProcessor> = ProcessorTypes<T>['Log']
+// Helper type to extract the Transaction type from a processor
+export type Transaction<T extends EvmBatchProcessor = EvmBatchProcessor> = ProcessorTypes<T>['Transaction']
+// Helper type to extract the Trace type from a processor
+export type Trace<T extends EvmBatchProcessor = EvmBatchProcessor> = ProcessorTypes<T>['Trace']
+// Helper type to extract the Context type from a processor
+export type Context<T extends EvmBatchProcessor = EvmBatchProcessor> = ProcessorTypes<T>['Context'] 
+
+export interface EvmProcessor<T extends EvmBatchProcessor = EvmBatchProcessor> {
   name: string
   from?: number
   chainId: number
-  initialize?: (ctx: Context) => Promise<void> // To only be run once per `sqd process`.
-  setup?: (p: ReturnType<typeof createEvmBatchProcessor>, chain: Chain) => void
-  process: (ctx: Context) => Promise<void>
+  initialize?: (ctx: Context<T>) => Promise<void> // To only be run once per `sqd process`.
+  setup?: (p: EvmBatchProcessor, chain: Chain) => void
+  process: (ctx: Context<T>) => Promise<void>
 }

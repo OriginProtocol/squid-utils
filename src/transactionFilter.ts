@@ -1,7 +1,6 @@
+import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { Transaction } from 'types'
 import { pad as viemPad } from 'viem'
-
-
-import { Transaction } from './types'
 
 const pad = (hex: string) => viemPad(hex as `0x${string}`)
 const lower = (hex: string) => hex.toLowerCase()
@@ -32,7 +31,11 @@ export const transactionFilter = (filter: TransactionFilter) => {
   }
   return {
     value: filter,
-    matches(transaction: Transaction) {
+    matches(transaction: Transaction<EvmBatchProcessor<{
+      transaction: {
+        sighash: true
+      }
+    }>>) {
       if (filter.from && !filter.from.includes(transaction.from)) {
         return false
       }

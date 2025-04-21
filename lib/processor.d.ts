@@ -2,99 +2,9 @@ import { Chain } from 'viem';
 import { EvmBatchProcessor, FieldSelection } from '@subsquid/evm-processor';
 import './polyfills/rpc-issues';
 import { Context } from './types';
-export declare const createEvmBatchProcessor: (config: ChainConfig, options?: {
+export declare const setupEvmBatchProcessor: (evmBatchProcessor: EvmBatchProcessor, config: ChainConfig, options?: {
     fields: FieldSelection;
-}) => EvmBatchProcessor<{
-    transaction: {
-        hash: boolean;
-        nonce?: boolean | undefined;
-        gasUsed: boolean;
-        sighash: boolean;
-        from: boolean;
-        to: boolean;
-        gas: boolean;
-        gasPrice?: boolean | undefined;
-        maxFeePerGas?: boolean | undefined;
-        maxPriorityFeePerGas?: boolean | undefined;
-        input: boolean;
-        value: boolean;
-        v?: boolean | undefined;
-        r?: boolean | undefined;
-        s?: boolean | undefined;
-        yParity?: boolean | undefined;
-        chainId?: boolean | undefined;
-        authorizationList?: boolean | undefined;
-        cumulativeGasUsed?: boolean | undefined;
-        effectiveGasPrice: boolean;
-        contractAddress?: boolean | undefined;
-        type?: boolean | undefined;
-        status: boolean;
-        l1Fee?: boolean | undefined;
-        l1FeeScalar?: boolean | undefined;
-        l1GasPrice?: boolean | undefined;
-        l1GasUsed?: boolean | undefined;
-        l1BlobBaseFee?: boolean | undefined;
-        l1BlobBaseFeeScalar?: boolean | undefined;
-        l1BaseFeeScalar?: boolean | undefined;
-    };
-    log: {
-        transactionHash: boolean;
-        address?: boolean | undefined;
-        data: boolean;
-        topics: boolean;
-    };
-    trace: {
-        subtraces?: boolean | undefined;
-        error: boolean;
-        revertReason: boolean;
-        createFrom?: boolean | undefined;
-        createGas?: boolean | undefined;
-        createValue?: boolean | undefined;
-        createInit?: boolean | undefined;
-        createResultGasUsed?: boolean | undefined;
-        createResultAddress: boolean;
-        createResultCode?: boolean | undefined;
-        callFrom: boolean;
-        callGas?: boolean | undefined;
-        callValue: boolean;
-        callSighash: boolean;
-        callTo: boolean;
-        callInput: boolean;
-        callCallType?: boolean | undefined;
-        callResultGasUsed?: boolean | undefined;
-        callResultOutput?: boolean | undefined;
-        suicideAddress: boolean;
-        suicideRefundAddress: boolean;
-        suicideBalance: boolean;
-        rewardValue?: boolean | undefined;
-        rewardType?: boolean | undefined;
-        rewardAuthor?: boolean | undefined;
-    };
-    block?: {
-        nonce?: boolean | undefined;
-        sha3Uncles?: boolean | undefined;
-        logsBloom?: boolean | undefined;
-        transactionsRoot?: boolean | undefined;
-        stateRoot?: boolean | undefined;
-        receiptsRoot?: boolean | undefined;
-        mixHash?: boolean | undefined;
-        miner?: boolean | undefined;
-        difficulty?: boolean | undefined;
-        totalDifficulty?: boolean | undefined;
-        extraData?: boolean | undefined;
-        size?: boolean | undefined;
-        gasLimit?: boolean | undefined;
-        gasUsed?: boolean | undefined;
-        timestamp?: boolean | undefined;
-        baseFeePerGas?: boolean | undefined;
-        l1BlockNumber?: boolean | undefined;
-    };
-    stateDiff?: {
-        kind?: boolean | undefined;
-        prev?: boolean | undefined;
-        next?: boolean | undefined;
-    };
-}>;
+}) => void;
 export interface SquidProcessor {
     fromNow?: boolean;
     chainId?: keyof typeof chainConfigs;
@@ -108,7 +18,7 @@ export interface Processor {
     name?: string;
     from?: number;
     initialize?: (ctx: Context) => Promise<void>;
-    setup?: (p: ReturnType<typeof createEvmBatchProcessor>, chain?: Chain) => void;
+    setup?: (p: EvmBatchProcessor, chain?: Chain) => void;
     process: (ctx: Context) => Promise<void>;
 }
 export declare const defineSquidProcessor: (p: SquidProcessor) => SquidProcessor;
@@ -936,4 +846,4 @@ export declare const chainConfigs: {
         readonly endpoints: string[];
     };
 };
-export declare const run: ({ fromNow, chainId, stateSchema, processors, postProcessors, validators, postValidation }: SquidProcessor) => Promise<void>;
+export declare const run: (evmBatchProcessor: EvmBatchProcessor, { fromNow, chainId, stateSchema, processors, postProcessors, validators, postValidation }: SquidProcessor) => Promise<void>;

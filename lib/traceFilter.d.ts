@@ -1,4 +1,5 @@
-import { Trace } from './types';
+import { EvmBatchProcessor } from "@subsquid/evm-processor";
+import { Trace } from "types";
 type TraceType = 'call' | 'create' | 'suicide' | 'reward';
 type TraceFilterParams = {
     type: TraceType[];
@@ -21,7 +22,14 @@ type TraceFilterParams = {
  */
 export declare const traceFilter: (filter: TraceFilterParams) => {
     readonly value: TraceFilterParams;
-    readonly matches: (trace: Trace) => boolean;
+    readonly matches: (trace: Trace<EvmBatchProcessor<{
+        trace: {
+            callTo: true;
+            callFrom: true;
+            callSighash: true;
+            suicideRefundAddress: true;
+        };
+    }>>) => boolean;
 };
 export type TraceFilter = ReturnType<typeof traceFilter>;
 export {};

@@ -1,5 +1,6 @@
+import { EvmBatchProcessor } from "@subsquid/evm-processor"
+import { Trace } from "types"
 
-import { Trace } from './types'
 
 type TraceType = 'call' | 'create' | 'suicide' | 'reward'
 type TraceFilterParams = {
@@ -37,7 +38,14 @@ export const traceFilter = (filter: TraceFilterParams) => {
   }
   return {
     value: filter,
-    matches(trace: Trace) {
+    matches(trace: Trace<EvmBatchProcessor<{
+      trace: {
+        callTo: true,
+        callFrom: true,
+        callSighash: true,
+        suicideRefundAddress: true,
+      }
+    }>>) {
       if (filter.type && !filter.type.includes(trace.type)) return false
       if (filter.callFrom && trace.type === 'call' && !filter.callFrom.includes(trace.action.from.toLowerCase())) return false
       if (filter.callTo && trace.type === 'call' && !filter.callTo.includes(trace.action.to.toLowerCase())) return false
