@@ -5,25 +5,25 @@ import { Context } from './types';
 export declare const setupEvmBatchProcessor: (evmBatchProcessor: EvmBatchProcessor, config: ChainConfig, options?: {
     fields: FieldSelection;
 }) => void;
-export interface SquidProcessor {
+export interface SquidProcessor<T extends EvmBatchProcessor = EvmBatchProcessor> {
     fromNow?: boolean;
     chainId?: keyof typeof chainConfigs;
     stateSchema: string;
-    processors: Processor[];
-    postProcessors?: Processor[];
-    validators?: Pick<Processor, 'process' | 'name'>[];
-    postValidation?: (ctx: Context) => Promise<void>;
+    processors: Processor<T>[];
+    postProcessors?: Processor<T>[];
+    validators?: Pick<Processor<T>, 'process' | 'name'>[];
+    postValidation?: (ctx: Context<T>) => Promise<void>;
 }
-export interface Processor {
+export interface Processor<T extends EvmBatchProcessor = EvmBatchProcessor> {
     name?: string;
     from?: number;
-    initialize?: (ctx: Context) => Promise<void>;
+    initialize?: (ctx: Context<T>) => Promise<void>;
     setup?: (p: EvmBatchProcessor, chain?: Chain) => void;
-    process: (ctx: Context) => Promise<void>;
+    process: (ctx: Context<T>) => Promise<void>;
 }
-export declare const defineSquidProcessor: (p: SquidProcessor) => SquidProcessor;
-export declare const defineProcessor: (p: Processor) => Processor;
-export declare const joinProcessors: (name: string, processors: Processor[]) => Processor;
+export declare const defineSquidProcessor: <T extends EvmBatchProcessor>(p: SquidProcessor<T>) => SquidProcessor<T>;
+export declare const defineProcessor: <T extends EvmBatchProcessor>(p: Processor<T>) => Processor<T>;
+export declare const joinProcessors: <T extends EvmBatchProcessor>(name: string, processors: Processor<T>[]) => Processor<T>;
 export interface ChainConfig {
     chain: Chain;
     gateway: string;

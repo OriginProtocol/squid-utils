@@ -43,27 +43,27 @@ export const setupEvmBatchProcessor = (evmBatchProcessor: EvmBatchProcessor, con
   }
 }
 
-export interface SquidProcessor {
+export interface SquidProcessor<T extends EvmBatchProcessor = EvmBatchProcessor> {
   fromNow?: boolean
   chainId?: keyof typeof chainConfigs
   stateSchema: string
-  processors: Processor[]
-  postProcessors?: Processor[]
-  validators?: Pick<Processor, 'process' | 'name'>[]
-  postValidation?: (ctx: Context) => Promise<void>
+  processors: Processor<T>[]
+  postProcessors?: Processor<T>[]
+  validators?: Pick<Processor<T>, 'process' | 'name'>[]
+  postValidation?: (ctx: Context<T>) => Promise<void>
 }
 
-export interface Processor {
+export interface Processor<T extends EvmBatchProcessor = EvmBatchProcessor> {
   name?: string
   from?: number
-  initialize?: (ctx: Context) => Promise<void> // To only be run once per `sqd process`.
+  initialize?: (ctx: Context<T>) => Promise<void> // To only be run once per `sqd process`.
   setup?: (p: EvmBatchProcessor, chain?: Chain) => void
-  process: (ctx: Context) => Promise<void>
+  process: (ctx: Context<T>) => Promise<void>
 }
 
-export const defineSquidProcessor = (p: SquidProcessor) => p
-export const defineProcessor = (p: Processor) => p
-export const joinProcessors = (name: string, processors: Processor[]): Processor => {
+export const defineSquidProcessor = <T extends EvmBatchProcessor>(p: SquidProcessor<T>) => p
+export const defineProcessor = <T extends EvmBatchProcessor>(p: Processor<T>) => p
+export const joinProcessors = <T extends EvmBatchProcessor>(name: string, processors: Processor<T>[]): Processor<T> => {
   return {
     name,
     from: processors.reduce(
