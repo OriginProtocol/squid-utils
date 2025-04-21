@@ -44,6 +44,7 @@ export const setupEvmBatchProcessor = (evmBatchProcessor: EvmBatchProcessor, con
 }
 
 export interface SquidProcessor<T extends EvmBatchProcessor = EvmBatchProcessor> {
+  evmBatchProcessor: T
   fromNow?: boolean
   chainId?: keyof typeof chainConfigs
   stateSchema: string
@@ -149,7 +150,7 @@ export const chainConfigs = {
   },
 } as const
 
-export const run = async <T extends EvmBatchProcessor<{ block: { timestamp: true } }>>(evmBatchProcessor: T, { fromNow, chainId = 1, stateSchema, processors, postProcessors, validators, postValidation }: SquidProcessor<T>) => {
+export const run = async <T extends EvmBatchProcessor<{ block: { timestamp: true } }>>({ evmBatchProcessor, fromNow, chainId = 1, stateSchema, processors, postProcessors, validators, postValidation }: SquidProcessor<T>) => {
   if (!fromNow) {
     assert(!processors.find((p) => p.from === undefined), 'All processors must have a `from` defined')
   }

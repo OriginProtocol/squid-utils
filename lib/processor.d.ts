@@ -6,6 +6,7 @@ export declare const setupEvmBatchProcessor: (evmBatchProcessor: EvmBatchProcess
     fields: FieldSelection;
 }) => void;
 export interface SquidProcessor<T extends EvmBatchProcessor = EvmBatchProcessor> {
+    evmBatchProcessor: T;
     fromNow?: boolean;
     chainId?: keyof typeof chainConfigs;
     stateSchema: string;
@@ -850,4 +851,4 @@ export declare const run: <T extends EvmBatchProcessor<{
     block: {
         timestamp: true;
     };
-}>>(evmBatchProcessor: T, { fromNow, chainId, stateSchema, processors, postProcessors, validators, postValidation }: SquidProcessor<T>) => Promise<void>;
+}>>({ evmBatchProcessor, fromNow, chainId, stateSchema, processors, postProcessors, validators, postValidation }: SquidProcessor<T>) => Promise<void>;
