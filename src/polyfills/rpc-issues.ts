@@ -14,12 +14,6 @@ const getMethodCUCost = (method: string): number => {
   return RPC_CU_COSTS[method] ?? DEFAULT_CU_COST;
 };
 
-const logRPCCall = (method: string, duration: number, cuCost: number) => {
-  if (process.env.DEBUG_PERF === 'true') {
-    console.log(`RPC Call: ${method} - Duration: ${duration}ms - CU Cost: ${cuCost}`);
-  }
-};
-
 RpcClient.prototype.call = async function <T = any>(
   method: string,
   params?: any[],
@@ -32,6 +26,11 @@ RpcClient.prototype.call = async function <T = any>(
   processingStats.totalCUCost += cuCost;
   processingStats.rpcCallTypes.set(method, (processingStats.rpcCallTypes.get(method) ?? 0) + 1);
   processingStats.rpcCUCosts.set(method, (processingStats.rpcCUCosts.get(method) ?? 0) + cuCost);
+  if (method === 'eth_call') {
+    const callMethod = params?.[0]?.data.slice(0, 10) ?? '';
+    const count = processingStats.ethCallCounts.get(callMethod) ?? 0;
+    processingStats.ethCallCounts.set(callMethod, count + 1);
+  }
 
   const response = await (this as any)._call(method, params, options);
   
@@ -62,6 +61,11 @@ RpcClient.prototype.batchCall = async function <T = any>(batch: RpcCall[], optio
     const cuCost = getMethodCUCost(method);
     processingStats.rpcCallTypes.set(method, (processingStats.rpcCallTypes.get(method) ?? 0) + 1);
     processingStats.rpcCUCosts.set(method, (processingStats.rpcCUCosts.get(method) ?? 0) + cuCost);
+    if (method === 'eth_call') {
+      const callMethod = (batch[i].params?.[0] as any)?.data.slice(0, 10) ?? '';
+      const count = processingStats.ethCallCounts.get(callMethod) ?? 0;
+      processingStats.ethCallCounts.set(callMethod, count + 1);
+    }
   }
 
   const duration = Date.now() - startTime;

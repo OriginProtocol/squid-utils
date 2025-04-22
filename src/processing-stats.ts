@@ -6,6 +6,7 @@ export const processingStats = {
   rpcCallTypes: new Map<string, number>(),
   totalCUCost: 0,
   rpcCUCosts: new Map<string, number>(),
+  ethCallCounts: new Map<string, number>(),
 }
 
 export const printStats = (ctx: Context) => {
@@ -28,6 +29,12 @@ export const printStats = (ctx: Context) => {
         callTypes,
         cuCosts,
         topCUMethods,
+      },
+      ethCallStats: {
+        top5: Array.from(processingStats.ethCallCounts.entries())
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5)
+          .map(([method, count]) => ({ method, count }))
       },
       blockStats: {
         blockCount: ctx.blocks.length,
