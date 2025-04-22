@@ -3,96 +3,37 @@ import { EvmBatchProcessor, FieldSelection } from '@subsquid/evm-processor';
 import './polyfills/rpc-issues';
 import { Context } from './types';
 export declare const createEvmBatchProcessor: (config: ChainConfig, options?: {
-    fields: FieldSelection;
+    fields?: FieldSelection;
 }) => EvmBatchProcessor<{
-    transaction: {
-        hash: boolean;
-        nonce?: boolean | undefined;
-        gasUsed: boolean;
-        sighash: boolean;
-        from: boolean;
-        to: boolean;
-        gas: boolean;
-        gasPrice?: boolean | undefined;
-        maxFeePerGas?: boolean | undefined;
-        maxPriorityFeePerGas?: boolean | undefined;
-        input: boolean;
-        value: boolean;
-        v?: boolean | undefined;
-        r?: boolean | undefined;
-        s?: boolean | undefined;
-        yParity?: boolean | undefined;
-        chainId?: boolean | undefined;
-        authorizationList?: boolean | undefined;
-        cumulativeGasUsed?: boolean | undefined;
-        effectiveGasPrice: boolean;
-        contractAddress?: boolean | undefined;
-        type?: boolean | undefined;
-        status: boolean;
-        l1Fee?: boolean | undefined;
-        l1FeeScalar?: boolean | undefined;
-        l1GasPrice?: boolean | undefined;
-        l1GasUsed?: boolean | undefined;
-        l1BlobBaseFee?: boolean | undefined;
-        l1BlobBaseFeeScalar?: boolean | undefined;
-        l1BaseFeeScalar?: boolean | undefined;
+    readonly transaction: {
+        readonly from: true;
+        readonly to: true;
+        readonly hash: true;
+        readonly gasUsed: true;
+        readonly gas: true;
+        readonly value: true;
+        readonly sighash: true;
+        readonly input: true;
+        readonly status: true;
+        readonly effectiveGasPrice: true;
     };
-    log: {
-        transactionHash: boolean;
-        address?: boolean | undefined;
-        data: boolean;
-        topics: boolean;
+    readonly log: {
+        readonly transactionHash: true;
+        readonly topics: true;
+        readonly data: true;
     };
-    trace: {
-        subtraces?: boolean | undefined;
-        error: boolean;
-        revertReason: boolean;
-        createFrom?: boolean | undefined;
-        createGas?: boolean | undefined;
-        createValue?: boolean | undefined;
-        createInit?: boolean | undefined;
-        createResultGasUsed?: boolean | undefined;
-        createResultAddress: boolean;
-        createResultCode?: boolean | undefined;
-        callFrom: boolean;
-        callGas?: boolean | undefined;
-        callValue: boolean;
-        callSighash: boolean;
-        callTo: boolean;
-        callInput: boolean;
-        callCallType?: boolean | undefined;
-        callResultGasUsed?: boolean | undefined;
-        callResultOutput?: boolean | undefined;
-        suicideAddress: boolean;
-        suicideRefundAddress: boolean;
-        suicideBalance: boolean;
-        rewardValue?: boolean | undefined;
-        rewardType?: boolean | undefined;
-        rewardAuthor?: boolean | undefined;
-    };
-    block?: {
-        nonce?: boolean | undefined;
-        sha3Uncles?: boolean | undefined;
-        logsBloom?: boolean | undefined;
-        transactionsRoot?: boolean | undefined;
-        stateRoot?: boolean | undefined;
-        receiptsRoot?: boolean | undefined;
-        mixHash?: boolean | undefined;
-        miner?: boolean | undefined;
-        difficulty?: boolean | undefined;
-        totalDifficulty?: boolean | undefined;
-        extraData?: boolean | undefined;
-        size?: boolean | undefined;
-        gasLimit?: boolean | undefined;
-        gasUsed?: boolean | undefined;
-        timestamp?: boolean | undefined;
-        baseFeePerGas?: boolean | undefined;
-        l1BlockNumber?: boolean | undefined;
-    };
-    stateDiff?: {
-        kind?: boolean | undefined;
-        prev?: boolean | undefined;
-        next?: boolean | undefined;
+    readonly trace: {
+        readonly callFrom: true;
+        readonly callTo: true;
+        readonly callSighash: true;
+        readonly callValue: true;
+        readonly callInput: true;
+        readonly createResultAddress: true;
+        readonly suicideRefundAddress: true;
+        readonly suicideAddress: true;
+        readonly suicideBalance: true;
+        readonly error: true;
+        readonly revertReason: true;
     };
 }>;
 export interface SquidProcessor {
@@ -103,6 +44,7 @@ export interface SquidProcessor {
     postProcessors?: Processor[];
     validators?: Pick<Processor, 'process' | 'name'>[];
     postValidation?: (ctx: Context) => Promise<void>;
+    fields?: FieldSelection;
 }
 export interface Processor {
     name?: string;
@@ -936,4 +878,4 @@ export declare const chainConfigs: {
         readonly endpoints: string[];
     };
 };
-export declare const run: ({ fromNow, chainId, stateSchema, processors, postProcessors, validators, postValidation }: SquidProcessor) => Promise<void>;
+export declare const run: ({ fromNow, chainId, stateSchema, processors, postProcessors, validators, postValidation, fields }: SquidProcessor) => Promise<void>;
