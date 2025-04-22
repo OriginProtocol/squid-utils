@@ -6,10 +6,10 @@ export type ProcessorTypes<T extends EvmBatchProcessor> = {
     Context: DataHandlerContext<Store, EvmBatchProcessorFields<T>> & {
         chain: Chain;
         blockRate: number;
-        blocksWithContent: Block<T>[];
-        lastBlockPerDay: Map<string, Block<T>>;
-        latestBlockOfDay: (block: Block<T>) => boolean;
-        frequencyBlocks: Block<T>[];
+        blocksWithContent: DataHandlerContext<Store, EvmBatchProcessorFields<T>>['blocks'][number][];
+        lastBlockPerDay: Map<string, DataHandlerContext<Store, EvmBatchProcessorFields<T>>['blocks'][number]>;
+        latestBlockOfDay: (block: DataHandlerContext<Store, EvmBatchProcessorFields<T>>['blocks'][number]) => boolean;
+        frequencyBlocks: DataHandlerContext<Store, EvmBatchProcessorFields<T>>['blocks'][number][];
         __state: Map<string, unknown>;
     };
     Block: DataHandlerContext<Store, EvmBatchProcessorFields<T>>['blocks'][number];
