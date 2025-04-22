@@ -18,8 +18,41 @@ import { Block, Context } from './types'
 dayjs.extend(duration)
 dayjs.extend(utc)
 
+const DEFAULT_FIELDS = {
+  transaction: {
+    from: true,
+    to: true,
+    hash: true,
+    gasUsed: true,
+    gas: true,
+    value: true,
+    sighash: true,
+    input: true,
+    status: true,
+    effectiveGasPrice: true,
+  },
+  log: {
+    transactionHash: true,
+    topics: true,
+    data: true,
+  },
+  trace: {
+    callFrom: true,
+    callTo: true,
+    callSighash: true,
+    callValue: true,
+    callInput: true,
+    createResultAddress: true,
+    suicideRefundAddress: true,
+    suicideAddress: true,
+    suicideBalance: true,
+    error: true,
+    revertReason: true,
+  },
+} as const
+
 export const createEvmBatchProcessor = (config: ChainConfig, options?: {
-  fields: FieldSelection
+  fields?: FieldSelection
 }) => {
   const url = config.endpoints[0] || 'http://localhost:8545'
   console.log('rpc url', url)
@@ -34,42 +67,7 @@ export const createEvmBatchProcessor = (config: ChainConfig, options?: {
       headPollInterval: 5000,
     })
     .setFinalityConfirmation(10)
-    .setFields({
-      ...options?.fields,
-      transaction: {
-        from: true,
-        to: true,
-        hash: true,
-        gasUsed: true,
-        gas: true,
-        value: true,
-        sighash: true,
-        input: true,
-        status: true,
-        effectiveGasPrice: true,
-        ...options?.fields?.transaction,
-      },
-      log: {
-        transactionHash: true,
-        topics: true,
-        data: true,
-        ...options?.fields?.log,
-      },
-      trace: {
-        callFrom: true,
-        callTo: true,
-        callSighash: true,
-        callValue: true,
-        callInput: true,
-        createResultAddress: true,
-        suicideRefundAddress: true,
-        suicideAddress: true,
-        suicideBalance: true,
-        error: true,
-        revertReason: true,
-        ...options?.fields?.trace,
-      },
-    })
+    .setFields(options?.fields ? options?.fields as typeof DEFAULT_FIELDS : DEFAULT_FIELDS)
 
   if (process.env.DISABLE_ARCHIVE !== 'true') {
     console.log(`Archive gateway: ${config.gateway}`)
@@ -89,6 +87,7 @@ export interface SquidProcessor {
   postProcessors?: Processor[]
   validators?: Pick<Processor, 'process' | 'name'>[]
   postValidation?: (ctx: Context) => Promise<void>
+  fields?: FieldSelection
 }
 
 export interface Processor {
@@ -187,7 +186,7 @@ export const chainConfigs = {
   },
 } as const
 
-export const run = async ({ fromNow, chainId = 1, stateSchema, processors, postProcessors, validators, postValidation }: SquidProcessor) => {
+export const run = async ({ fromNow, chainId = 1, stateSchema, processors, postProcessors, validators, postValidation, fields }: SquidProcessor) => {
   if (!fromNow) {
     assert(!processors.find((p) => p.from === undefined), 'All processors must have a `from` defined')
   }
@@ -205,7 +204,7 @@ export const run = async ({ fromNow, chainId = 1, stateSchema, processors, postP
   if (!config) throw new Error('No chain configuration found.')
   // console.log('env', JSON.stringify(process.env, null, 2))
   // console.log('config', JSON.stringify(config, null, 2))
-  const evmBatchProcessor = createEvmBatchProcessor(config)
+  const evmBatchProcessor = createEvmBatchProcessor(config, { fields })
 
 
   const client = createPublicClient({ chain: config.chain, transport: http(config.endpoints[0]) })
