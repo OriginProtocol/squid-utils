@@ -255,6 +255,7 @@ export const run = async ({ fromNow, chainId = 1, stateSchema, processors, postP
         ctx.frequencyBlocks = ctx.blocks.filter((b) => frequencyTracker(ctx, b))
         ctx.lastBlockPerDay = new Map<string, Block>()
         for (const block of ctx.blocks) {
+          if (!block.header.timestamp) continue
           ctx.lastBlockPerDay.set(new Date(block.header.timestamp).toISOString().slice(0, 10), block)
         }
         ctx.latestBlockOfDay = (block: Block) => {
