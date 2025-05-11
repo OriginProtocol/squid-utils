@@ -66,7 +66,7 @@ export const createEvmBatchProcessor = (config: ChainConfig, options?: {
       disabled: process.env.ARCHIVE_ONLY === 'true',
       headPollInterval: 5000,
     })
-    .setFinalityConfirmation(10)
+    .setFinalityConfirmation(50)
     .setFields(options?.fields ? options?.fields as typeof DEFAULT_FIELDS : DEFAULT_FIELDS)
 
   if (process.env.DISABLE_ARCHIVE !== 'true') {
