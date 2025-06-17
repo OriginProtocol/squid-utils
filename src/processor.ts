@@ -247,7 +247,7 @@ export const run = async ({ fromNow, chainId = 1, stateSchema, processors, postP
         ctx.__state = new Map<string, unknown>()
         if (ctx.blocks.length >= 1) {
           ctx.blockRate = await calculateBlockRate(ctx)
-          ctx.log.info(`Block rate: ${ctx.blockRate}`)
+          // ctx.log.info(`Block rate: ${ctx.blockRate}`)
         }
         ctx.blocksWithContent = ctx.blocks.filter(
           (b) => b.logs.length > 0 || b.traces.length > 0 || b.transactions.length > 0,
