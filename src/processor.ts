@@ -2,7 +2,7 @@ import assert from 'assert'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import utc from 'dayjs/plugin/utc'
-import { compact } from 'lodash'
+import { compact, isEqual, uniqWith } from 'lodash'
 import { Chain, createPublicClient, http } from 'viem'
 import { arbitrum, base, bsc, mainnet, optimism, plumeMainnet, sonic } from 'viem/chains'
 
@@ -231,6 +231,10 @@ export const run = async ({ fromNow, chainId = 1, stateSchema, processors, postP
   })
   processors.forEach((p) => p.setup?.(evmBatchProcessor, config.chain))
   postProcessors?.forEach((p) => p.setup?.(evmBatchProcessor, config.chain))
+
+  const evmBatchProcessorWithRequests: { requests: any[] } = evmBatchProcessor as any
+  evmBatchProcessorWithRequests.requests = uniqWith(evmBatchProcessorWithRequests.requests, isEqual)
+
   const frequencyTracker = blockFrequencyTracker({ from })
   let contextTime = Date.now()
   const averageTimeMap = new Map<string, [number, number]>()
