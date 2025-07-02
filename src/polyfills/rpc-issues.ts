@@ -23,9 +23,7 @@ RpcClient.prototype.call = async function <T = any>(
   const cuCost = getMethodCUCost(method);
   
   processingStats.rpcCalls++;
-  processingStats.totalCUCost += cuCost;
   processingStats.rpcCallTypes.set(method, (processingStats.rpcCallTypes.get(method) ?? 0) + 1);
-  processingStats.rpcCUCosts.set(method, (processingStats.rpcCUCosts.get(method) ?? 0) + cuCost);
   if (method === 'eth_call') {
     const callMethod = params?.[0]?.data.slice(0, 10) ?? '';
     const count = processingStats.ethCallCounts.get(callMethod) ?? 0;
@@ -49,7 +47,6 @@ RpcClient.prototype.batchCall = async function <T = any>(batch: RpcCall[], optio
   const batchCUCost = batch.reduce((total, call) => total + getMethodCUCost(call.method), 0);
   
   processingStats.rpcCalls += batch.length;
-  processingStats.totalCUCost += batchCUCost;
   
   const response = await (this as any)._batchCall(batch, options);
   
@@ -60,7 +57,6 @@ RpcClient.prototype.batchCall = async function <T = any>(batch: RpcCall[], optio
     const method = batch[i].method;
     const cuCost = getMethodCUCost(method);
     processingStats.rpcCallTypes.set(method, (processingStats.rpcCallTypes.get(method) ?? 0) + 1);
-    processingStats.rpcCUCosts.set(method, (processingStats.rpcCUCosts.get(method) ?? 0) + cuCost);
     if (method === 'eth_call') {
       const callMethod = (batch[i].params?.[0] as any)?.data.slice(0, 10) ?? '';
       const count = processingStats.ethCallCounts.get(callMethod) ?? 0;
