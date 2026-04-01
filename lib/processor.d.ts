@@ -71,13 +71,11 @@ export declare const chainConfigs: {
                     readonly apiUrl: "https://api.etherscan.io/api";
                 };
             };
+            blockTime: 12000;
             contracts: {
-                readonly ensRegistry: {
-                    readonly address: "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e";
-                };
                 readonly ensUniversalResolver: {
-                    readonly address: "0xce01f8eee7E479C928F8919abD53E553a36CeF67";
-                    readonly blockCreated: 19258213;
+                    readonly address: "0xeeeeeeee14d718c2b47d9923deab1335e144eeee";
+                    readonly blockCreated: 23085558;
                 };
                 readonly multicall3: {
                     readonly address: "0xca11bde05977b3631167028862be2a173976ca11";
@@ -92,6 +90,7 @@ export declare const chainConfigs: {
                 readonly symbol: "ETH";
                 readonly decimals: 18;
             };
+            experimental_preconfirmationTime?: number | undefined | undefined;
             rpcUrls: {
                 readonly default: {
                     readonly http: readonly ["https://eth.merkle.io"];
@@ -100,9 +99,18 @@ export declare const chainConfigs: {
             sourceId?: number | undefined | undefined;
             testnet?: boolean | undefined | undefined;
             custom?: Record<string, unknown> | undefined;
+            extendSchema?: Record<string, unknown> | undefined;
             fees?: import("viem").ChainFees<undefined> | undefined;
             formatters?: undefined;
+            prepareTransactionRequest?: ((args: import("viem").PrepareTransactionRequestParameters, options: {
+                phase: "beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters";
+            }) => Promise<import("viem").PrepareTransactionRequestParameters>) | [fn: ((args: import("viem").PrepareTransactionRequestParameters, options: {
+                phase: "beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters";
+            }) => Promise<import("viem").PrepareTransactionRequestParameters>) | undefined, options: {
+                runAt: readonly ("beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters")[];
+            }] | undefined;
             serializers?: import("viem").ChainSerializers<undefined, import("viem").TransactionSerializable> | undefined;
+            verifyHash?: ((client: import("viem").Client, parameters: import("viem").VerifyHashActionParameters) => Promise<import("viem").VerifyHashActionReturnType>) | undefined;
         };
         readonly gateway: "https://v2.archive.subsquid.io/network/ethereum-mainnet";
         readonly endpoints: string[];
@@ -116,6 +124,7 @@ export declare const chainConfigs: {
                     readonly apiUrl: "https://api.arbiscan.io/api";
                 };
             };
+            blockTime: 250;
             contracts: {
                 readonly multicall3: {
                     readonly address: "0xca11bde05977b3631167028862be2a173976ca11";
@@ -130,6 +139,7 @@ export declare const chainConfigs: {
                 readonly symbol: "ETH";
                 readonly decimals: 18;
             };
+            experimental_preconfirmationTime?: number | undefined | undefined;
             rpcUrls: {
                 readonly default: {
                     readonly http: readonly ["https://arb1.arbitrum.io/rpc"];
@@ -138,9 +148,18 @@ export declare const chainConfigs: {
             sourceId?: number | undefined | undefined;
             testnet?: boolean | undefined | undefined;
             custom?: Record<string, unknown> | undefined;
+            extendSchema?: Record<string, unknown> | undefined;
             fees?: import("viem").ChainFees<undefined> | undefined;
             formatters?: undefined;
+            prepareTransactionRequest?: ((args: import("viem").PrepareTransactionRequestParameters, options: {
+                phase: "beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters";
+            }) => Promise<import("viem").PrepareTransactionRequestParameters>) | [fn: ((args: import("viem").PrepareTransactionRequestParameters, options: {
+                phase: "beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters";
+            }) => Promise<import("viem").PrepareTransactionRequestParameters>) | undefined, options: {
+                runAt: readonly ("beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters")[];
+            }] | undefined;
             serializers?: import("viem").ChainSerializers<undefined, import("viem").TransactionSerializable> | undefined;
+            verifyHash?: ((client: import("viem").Client, parameters: import("viem").VerifyHashActionParameters) => Promise<import("viem").VerifyHashActionReturnType>) | undefined;
         };
         readonly gateway: "https://v2.archive.subsquid.io/network/arbitrum-one";
         readonly endpoints: string[];
@@ -154,6 +173,7 @@ export declare const chainConfigs: {
                     readonly apiUrl: "https://api.basescan.org/api";
                 };
             };
+            blockTime: 2000;
             contracts: {
                 readonly disputeGameFactory: {
                     readonly 1: {
@@ -208,6 +228,7 @@ export declare const chainConfigs: {
                 readonly symbol: "ETH";
                 readonly decimals: 18;
             };
+            experimental_preconfirmationTime?: number | undefined | undefined;
             rpcUrls: {
                 readonly default: {
                     readonly http: readonly ["https://mainnet.base.org"];
@@ -216,11 +237,12 @@ export declare const chainConfigs: {
             sourceId: 1;
             testnet?: boolean | undefined | undefined;
             custom?: Record<string, unknown> | undefined;
+            extendSchema?: Record<string, unknown> | undefined;
             fees?: import("viem").ChainFees<undefined> | undefined;
             formatters: {
                 readonly block: {
                     exclude: [] | undefined;
-                    format: (args: import("viem/chains").OpStackRpcBlock) => {
+                    format: (args: import("viem/chains").OpStackRpcBlock, action?: string | undefined) => {
                         baseFeePerGas: bigint | null;
                         blobGasUsed: bigint;
                         difficulty: bigint;
@@ -253,7 +275,7 @@ export declare const chainConfigs: {
                 };
                 readonly transaction: {
                     exclude: [] | undefined;
-                    format: (args: import("viem/chains").OpStackRpcTransaction) => ({
+                    format: (args: import("viem/chains").OpStackRpcTransaction, action?: string | undefined) => ({
                         blockHash: `0x${string}` | null;
                         blockNumber: bigint | null;
                         from: import("viem").Address;
@@ -422,11 +444,12 @@ export declare const chainConfigs: {
                 };
                 readonly transactionReceipt: {
                     exclude: [] | undefined;
-                    format: (args: import("viem/chains").OpStackRpcTransactionReceipt) => {
+                    format: (args: import("viem/chains").OpStackRpcTransactionReceipt, action?: string | undefined) => {
                         blobGasPrice?: bigint | undefined;
                         blobGasUsed?: bigint | undefined;
                         blockHash: import("viem").Hash;
                         blockNumber: bigint;
+                        blockTimestamp?: bigint | undefined;
                         contractAddress: import("viem").Address | null | undefined;
                         cumulativeGasUsed: bigint;
                         effectiveGasPrice: bigint;
@@ -448,9 +471,17 @@ export declare const chainConfigs: {
                     type: "transactionReceipt";
                 };
             };
+            prepareTransactionRequest?: ((args: import("viem").PrepareTransactionRequestParameters, options: {
+                phase: "beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters";
+            }) => Promise<import("viem").PrepareTransactionRequestParameters>) | [fn: ((args: import("viem").PrepareTransactionRequestParameters, options: {
+                phase: "beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters";
+            }) => Promise<import("viem").PrepareTransactionRequestParameters>) | undefined, options: {
+                runAt: readonly ("beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters")[];
+            }] | undefined;
             serializers: {
                 readonly transaction: typeof import("viem/chains").serializeTransactionOpStack;
             };
+            verifyHash?: ((client: import("viem").Client, parameters: import("viem").VerifyHashActionParameters) => Promise<import("viem").VerifyHashActionReturnType>) | undefined;
         };
         readonly gateway: "https://v2.archive.subsquid.io/network/base-mainnet";
         readonly endpoints: string[];
@@ -463,6 +494,7 @@ export declare const chainConfigs: {
                     readonly url: "https://sonicscan.org";
                 };
             };
+            blockTime: 630;
             contracts: {
                 readonly multicall3: {
                     readonly address: "0xca11bde05977b3631167028862be2a173976ca11";
@@ -477,6 +509,7 @@ export declare const chainConfigs: {
                 readonly name: "Sonic";
                 readonly symbol: "S";
             };
+            experimental_preconfirmationTime?: number | undefined | undefined;
             rpcUrls: {
                 readonly default: {
                     readonly http: readonly ["https://rpc.soniclabs.com"];
@@ -485,9 +518,18 @@ export declare const chainConfigs: {
             sourceId?: number | undefined | undefined;
             testnet: false;
             custom?: Record<string, unknown> | undefined;
+            extendSchema?: Record<string, unknown> | undefined;
             fees?: import("viem").ChainFees<undefined> | undefined;
             formatters?: undefined;
+            prepareTransactionRequest?: ((args: import("viem").PrepareTransactionRequestParameters, options: {
+                phase: "beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters";
+            }) => Promise<import("viem").PrepareTransactionRequestParameters>) | [fn: ((args: import("viem").PrepareTransactionRequestParameters, options: {
+                phase: "beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters";
+            }) => Promise<import("viem").PrepareTransactionRequestParameters>) | undefined, options: {
+                runAt: readonly ("beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters")[];
+            }] | undefined;
             serializers?: import("viem").ChainSerializers<undefined, import("viem").TransactionSerializable> | undefined;
+            verifyHash?: ((client: import("viem").Client, parameters: import("viem").VerifyHashActionParameters) => Promise<import("viem").VerifyHashActionReturnType>) | undefined;
         };
         readonly gateway: "https://v2.archive.subsquid.io/network/sonic-mainnet";
         readonly endpoints: string[];
@@ -501,6 +543,7 @@ export declare const chainConfigs: {
                     readonly apiUrl: "https://api-optimistic.etherscan.io/api";
                 };
             };
+            blockTime: 2000;
             contracts: {
                 readonly disputeGameFactory: {
                     readonly 1: {
@@ -553,6 +596,7 @@ export declare const chainConfigs: {
                 readonly symbol: "ETH";
                 readonly decimals: 18;
             };
+            experimental_preconfirmationTime?: number | undefined | undefined;
             rpcUrls: {
                 readonly default: {
                     readonly http: readonly ["https://mainnet.optimism.io"];
@@ -561,11 +605,12 @@ export declare const chainConfigs: {
             sourceId: 1;
             testnet?: boolean | undefined | undefined;
             custom?: Record<string, unknown> | undefined;
+            extendSchema?: Record<string, unknown> | undefined;
             fees?: import("viem").ChainFees<undefined> | undefined;
             formatters: {
                 readonly block: {
                     exclude: [] | undefined;
-                    format: (args: import("viem/chains").OpStackRpcBlock) => {
+                    format: (args: import("viem/chains").OpStackRpcBlock, action?: string | undefined) => {
                         baseFeePerGas: bigint | null;
                         blobGasUsed: bigint;
                         difficulty: bigint;
@@ -598,7 +643,7 @@ export declare const chainConfigs: {
                 };
                 readonly transaction: {
                     exclude: [] | undefined;
-                    format: (args: import("viem/chains").OpStackRpcTransaction) => ({
+                    format: (args: import("viem/chains").OpStackRpcTransaction, action?: string | undefined) => ({
                         blockHash: `0x${string}` | null;
                         blockNumber: bigint | null;
                         from: import("viem").Address;
@@ -767,11 +812,12 @@ export declare const chainConfigs: {
                 };
                 readonly transactionReceipt: {
                     exclude: [] | undefined;
-                    format: (args: import("viem/chains").OpStackRpcTransactionReceipt) => {
+                    format: (args: import("viem/chains").OpStackRpcTransactionReceipt, action?: string | undefined) => {
                         blobGasPrice?: bigint | undefined;
                         blobGasUsed?: bigint | undefined;
                         blockHash: import("viem").Hash;
                         blockNumber: bigint;
+                        blockTimestamp?: bigint | undefined;
                         contractAddress: import("viem").Address | null | undefined;
                         cumulativeGasUsed: bigint;
                         effectiveGasPrice: bigint;
@@ -793,9 +839,17 @@ export declare const chainConfigs: {
                     type: "transactionReceipt";
                 };
             };
+            prepareTransactionRequest?: ((args: import("viem").PrepareTransactionRequestParameters, options: {
+                phase: "beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters";
+            }) => Promise<import("viem").PrepareTransactionRequestParameters>) | [fn: ((args: import("viem").PrepareTransactionRequestParameters, options: {
+                phase: "beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters";
+            }) => Promise<import("viem").PrepareTransactionRequestParameters>) | undefined, options: {
+                runAt: readonly ("beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters")[];
+            }] | undefined;
             serializers: {
                 readonly transaction: typeof import("viem/chains").serializeTransactionOpStack;
             };
+            verifyHash?: ((client: import("viem").Client, parameters: import("viem").VerifyHashActionParameters) => Promise<import("viem").VerifyHashActionReturnType>) | undefined;
         };
         readonly gateway: "https://v2.archive.subsquid.io/network/optimism-mainnet";
         readonly endpoints: string[];
@@ -809,6 +863,7 @@ export declare const chainConfigs: {
                     readonly apiUrl: "https://api.bscscan.com/api";
                 };
             };
+            blockTime: 750;
             contracts: {
                 readonly multicall3: {
                     readonly address: "0xca11bde05977b3631167028862be2a173976ca11";
@@ -823,6 +878,7 @@ export declare const chainConfigs: {
                 readonly name: "BNB";
                 readonly symbol: "BNB";
             };
+            experimental_preconfirmationTime?: number | undefined | undefined;
             rpcUrls: {
                 readonly default: {
                     readonly http: readonly ["https://56.rpc.thirdweb.com"];
@@ -831,9 +887,18 @@ export declare const chainConfigs: {
             sourceId?: number | undefined | undefined;
             testnet?: boolean | undefined | undefined;
             custom?: Record<string, unknown> | undefined;
+            extendSchema?: Record<string, unknown> | undefined;
             fees?: import("viem").ChainFees<undefined> | undefined;
             formatters?: undefined;
+            prepareTransactionRequest?: ((args: import("viem").PrepareTransactionRequestParameters, options: {
+                phase: "beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters";
+            }) => Promise<import("viem").PrepareTransactionRequestParameters>) | [fn: ((args: import("viem").PrepareTransactionRequestParameters, options: {
+                phase: "beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters";
+            }) => Promise<import("viem").PrepareTransactionRequestParameters>) | undefined, options: {
+                runAt: readonly ("beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters")[];
+            }] | undefined;
             serializers?: import("viem").ChainSerializers<undefined, import("viem").TransactionSerializable> | undefined;
+            verifyHash?: ((client: import("viem").Client, parameters: import("viem").VerifyHashActionParameters) => Promise<import("viem").VerifyHashActionReturnType>) | undefined;
         };
         readonly gateway: "https://v2.archive.subsquid.io/network/binance-mainnet";
         readonly endpoints: string[];
@@ -843,10 +908,11 @@ export declare const chainConfigs: {
             blockExplorers: {
                 readonly default: {
                     readonly name: "Blockscout";
-                    readonly url: "https://phoenix-explorer.plumenetwork.xyz";
-                    readonly apiUrl: "https://phoenix-explorer.plumenetwork.xyz/api";
+                    readonly url: "https://explorer.plume.org";
+                    readonly apiUrl: "https://explorer.plume.org/api";
                 };
             };
+            blockTime?: number | undefined | undefined;
             contracts: {
                 readonly multicall3: {
                     readonly address: "0xcA11bde05977b3631167028862bE2a173976CA11";
@@ -861,20 +927,81 @@ export declare const chainConfigs: {
                 readonly symbol: "PLUME";
                 readonly decimals: 18;
             };
+            experimental_preconfirmationTime?: number | undefined | undefined;
             rpcUrls: {
                 readonly default: {
-                    readonly http: readonly ["https://phoenix-rpc.plumenetwork.xyz"];
-                    readonly webSocket: readonly ["wss://phoenix-rpc.plumenetwork.xyz"];
+                    readonly http: readonly ["https://rpc.plume.org"];
+                    readonly webSocket: readonly ["wss://rpc.plume.org"];
                 };
             };
             sourceId: 1;
             testnet?: boolean | undefined | undefined;
             custom?: Record<string, unknown> | undefined;
+            extendSchema?: Record<string, unknown> | undefined;
             fees?: import("viem").ChainFees<undefined> | undefined;
             formatters?: undefined;
+            prepareTransactionRequest?: ((args: import("viem").PrepareTransactionRequestParameters, options: {
+                phase: "beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters";
+            }) => Promise<import("viem").PrepareTransactionRequestParameters>) | [fn: ((args: import("viem").PrepareTransactionRequestParameters, options: {
+                phase: "beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters";
+            }) => Promise<import("viem").PrepareTransactionRequestParameters>) | undefined, options: {
+                runAt: readonly ("beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters")[];
+            }] | undefined;
             serializers?: import("viem").ChainSerializers<undefined, import("viem").TransactionSerializable> | undefined;
+            verifyHash?: ((client: import("viem").Client, parameters: import("viem").VerifyHashActionParameters) => Promise<import("viem").VerifyHashActionReturnType>) | undefined;
         };
         readonly gateway: "https://v2.archive.subsquid.io/network/plume";
+        readonly endpoints: string[];
+    };
+    readonly 999: {
+        readonly chain: {
+            blockExplorers: {
+                readonly default: {
+                    readonly name: "HyperEVMScan";
+                    readonly url: "https://hyperevmscan.io";
+                };
+            };
+            blockTime?: number | undefined | undefined;
+            contracts?: {
+                [x: string]: import("viem").ChainContract | {
+                    [sourceId: number]: import("viem").ChainContract | undefined;
+                } | undefined;
+                ensRegistry?: import("viem").ChainContract | undefined;
+                ensUniversalResolver?: import("viem").ChainContract | undefined;
+                multicall3?: import("viem").ChainContract | undefined;
+                erc6492Verifier?: import("viem").ChainContract | undefined;
+            } | undefined;
+            ensTlds?: readonly string[] | undefined;
+            id: 999;
+            name: "HyperEVM";
+            nativeCurrency: {
+                readonly name: "HYPE";
+                readonly symbol: "HYPE";
+                readonly decimals: 18;
+            };
+            experimental_preconfirmationTime?: number | undefined | undefined;
+            rpcUrls: {
+                readonly default: {
+                    readonly http: readonly ["https://rpc.hyperliquid.xyz/evm"];
+                };
+            };
+            sourceId?: number | undefined | undefined;
+            testnet: false;
+            custom?: Record<string, unknown> | undefined;
+            extendSchema?: Record<string, unknown> | undefined;
+            fees?: import("viem").ChainFees<undefined> | undefined;
+            formatters?: undefined;
+            prepareTransactionRequest?: ((args: import("viem").PrepareTransactionRequestParameters, options: {
+                phase: "beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters";
+            }) => Promise<import("viem").PrepareTransactionRequestParameters>) | [fn: ((args: import("viem").PrepareTransactionRequestParameters, options: {
+                phase: "beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters";
+            }) => Promise<import("viem").PrepareTransactionRequestParameters>) | undefined, options: {
+                runAt: readonly ("beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters")[];
+            }] | undefined;
+            serializers?: import("viem").ChainSerializers<undefined, import("viem").TransactionSerializable> | undefined;
+            verifyHash?: ((client: import("viem").Client, parameters: import("viem").VerifyHashActionParameters) => Promise<import("viem").VerifyHashActionReturnType>) | undefined;
+        };
+        readonly gateway: "https://v2.archive.subsquid.io/network/hyperliquid-mainnet";
         readonly endpoints: string[];
     };
 };
