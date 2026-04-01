@@ -24,7 +24,7 @@
     "dayjs": "^1.11.13",
     "lodash": "^4.17.21",
     "node-fetch": "^2.7.0",
-    "viem": "^2.27.2"
+    "viem": "^2.40.1"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.14",

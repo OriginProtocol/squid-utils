@@ -4,7 +4,7 @@ import duration from 'dayjs/plugin/duration'
 import utc from 'dayjs/plugin/utc'
 import { compact, isEqual, uniqWith } from 'lodash'
 import { Chain, createPublicClient, http } from 'viem'
-import { arbitrum, base, bsc, mainnet, optimism, plumeMainnet, sonic } from 'viem/chains'
+import { arbitrum, base, bsc, hyperEvm, mainnet, optimism, plumeMainnet, sonic } from 'viem/chains'
 
 import { EvmBatchProcessor, FieldSelection } from '@subsquid/evm-processor'
 import { TypeormDatabase } from '@subsquid/typeorm-store'
@@ -182,6 +182,14 @@ export const chainConfigs = {
     endpoints: compact([
       process.env[process.env.RPC_PLUME_ENV ?? 'RPC_PLUME_ENDPOINT'],
       process.env[process.env.RPC_PLUME_ENV_BACKUP ?? 'RPC_PLUME_HTTP'],
+    ]),
+  },
+  [hyperEvm.id]: {
+    chain: hyperEvm,
+    gateway: 'https://v2.archive.subsquid.io/network/hyperliquid-mainnet',
+    endpoints: compact([
+      process.env[process.env.RPC_HYPEREVM_ENV ?? 'RPC_HYPEREVM_ENDPOINT'],
+      process.env[process.env.RPC_HYPEREVM_ENV_BACKUP ?? 'RPC_HYPEREVM_HTTP'],
     ]),
   },
 } as const
