@@ -59,6 +59,7 @@ export declare const joinProcessors: (name: string, processors: Processor[]) => 
 export interface ChainConfig {
     chain: Chain;
     gateway: string;
+    portal: string;
     endpoints: string[];
 }
 export declare const chainConfigs: {
@@ -113,6 +114,7 @@ export declare const chainConfigs: {
             verifyHash?: ((client: import("viem").Client, parameters: import("viem").VerifyHashActionParameters) => Promise<import("viem").VerifyHashActionReturnType>) | undefined;
         };
         readonly gateway: "https://v2.archive.subsquid.io/network/ethereum-mainnet";
+        readonly portal: string;
         readonly endpoints: string[];
     };
     readonly 42161: {
@@ -162,6 +164,7 @@ export declare const chainConfigs: {
             verifyHash?: ((client: import("viem").Client, parameters: import("viem").VerifyHashActionParameters) => Promise<import("viem").VerifyHashActionReturnType>) | undefined;
         };
         readonly gateway: "https://v2.archive.subsquid.io/network/arbitrum-one";
+        readonly portal: string;
         readonly endpoints: string[];
     };
     readonly 8453: {
@@ -484,6 +487,7 @@ export declare const chainConfigs: {
             verifyHash?: ((client: import("viem").Client, parameters: import("viem").VerifyHashActionParameters) => Promise<import("viem").VerifyHashActionReturnType>) | undefined;
         };
         readonly gateway: "https://v2.archive.subsquid.io/network/base-mainnet";
+        readonly portal: string;
         readonly endpoints: string[];
     };
     readonly 146: {
@@ -532,6 +536,7 @@ export declare const chainConfigs: {
             verifyHash?: ((client: import("viem").Client, parameters: import("viem").VerifyHashActionParameters) => Promise<import("viem").VerifyHashActionReturnType>) | undefined;
         };
         readonly gateway: "https://v2.archive.subsquid.io/network/sonic-mainnet";
+        readonly portal: string;
         readonly endpoints: string[];
     };
     readonly 10: {
@@ -852,6 +857,7 @@ export declare const chainConfigs: {
             verifyHash?: ((client: import("viem").Client, parameters: import("viem").VerifyHashActionParameters) => Promise<import("viem").VerifyHashActionReturnType>) | undefined;
         };
         readonly gateway: "https://v2.archive.subsquid.io/network/optimism-mainnet";
+        readonly portal: string;
         readonly endpoints: string[];
     };
     readonly 56: {
@@ -901,56 +907,7 @@ export declare const chainConfigs: {
             verifyHash?: ((client: import("viem").Client, parameters: import("viem").VerifyHashActionParameters) => Promise<import("viem").VerifyHashActionReturnType>) | undefined;
         };
         readonly gateway: "https://v2.archive.subsquid.io/network/binance-mainnet";
-        readonly endpoints: string[];
-    };
-    readonly 98866: {
-        readonly chain: {
-            blockExplorers: {
-                readonly default: {
-                    readonly name: "Blockscout";
-                    readonly url: "https://explorer.plume.org";
-                    readonly apiUrl: "https://explorer.plume.org/api";
-                };
-            };
-            blockTime?: number | undefined | undefined;
-            contracts: {
-                readonly multicall3: {
-                    readonly address: "0xcA11bde05977b3631167028862bE2a173976CA11";
-                    readonly blockCreated: 39679;
-                };
-            };
-            ensTlds?: readonly string[] | undefined;
-            id: 98866;
-            name: "Plume";
-            nativeCurrency: {
-                readonly name: "Plume";
-                readonly symbol: "PLUME";
-                readonly decimals: 18;
-            };
-            experimental_preconfirmationTime?: number | undefined | undefined;
-            rpcUrls: {
-                readonly default: {
-                    readonly http: readonly ["https://rpc.plume.org"];
-                    readonly webSocket: readonly ["wss://rpc.plume.org"];
-                };
-            };
-            sourceId: 1;
-            testnet?: boolean | undefined | undefined;
-            custom?: Record<string, unknown> | undefined;
-            extendSchema?: Record<string, unknown> | undefined;
-            fees?: import("viem").ChainFees<undefined> | undefined;
-            formatters?: undefined;
-            prepareTransactionRequest?: ((args: import("viem").PrepareTransactionRequestParameters, options: {
-                phase: "beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters";
-            }) => Promise<import("viem").PrepareTransactionRequestParameters>) | [fn: ((args: import("viem").PrepareTransactionRequestParameters, options: {
-                phase: "beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters";
-            }) => Promise<import("viem").PrepareTransactionRequestParameters>) | undefined, options: {
-                runAt: readonly ("beforeFillTransaction" | "beforeFillParameters" | "afterFillParameters")[];
-            }] | undefined;
-            serializers?: import("viem").ChainSerializers<undefined, import("viem").TransactionSerializable> | undefined;
-            verifyHash?: ((client: import("viem").Client, parameters: import("viem").VerifyHashActionParameters) => Promise<import("viem").VerifyHashActionReturnType>) | undefined;
-        };
-        readonly gateway: "https://v2.archive.subsquid.io/network/plume";
+        readonly portal: string;
         readonly endpoints: string[];
     };
     readonly 999: {
@@ -1002,6 +959,7 @@ export declare const chainConfigs: {
             verifyHash?: ((client: import("viem").Client, parameters: import("viem").VerifyHashActionParameters) => Promise<import("viem").VerifyHashActionReturnType>) | undefined;
         };
         readonly gateway: "https://v2.archive.subsquid.io/network/hyperliquid-mainnet";
+        readonly portal: string;
         readonly endpoints: string[];
     };
 };

@@ -4,7 +4,7 @@ import duration from 'dayjs/plugin/duration'
 import utc from 'dayjs/plugin/utc'
 import { compact, isEqual, uniqWith } from 'lodash'
 import { Chain, createPublicClient, http } from 'viem'
-import { arbitrum, base, bsc, hyperEvm, mainnet, optimism, plumeMainnet, sonic } from 'viem/chains'
+import { arbitrum, base, bsc, hyperEvm, mainnet, optimism, sonic } from 'viem/chains'
 
 import { EvmBatchProcessor, FieldSelection } from '@subsquid/evm-processor'
 import { TypeormDatabase } from '@subsquid/typeorm-store'
@@ -69,11 +69,14 @@ export const createEvmBatchProcessor = (config: ChainConfig, options?: {
     .setFinalityConfirmation(50)
     .setFields(options?.fields ? options?.fields as typeof DEFAULT_FIELDS : DEFAULT_FIELDS)
 
-  if (process.env.DISABLE_ARCHIVE !== 'true') {
-    console.log(`Archive gateway: ${config.gateway}`)
+  if (process.env.DISABLE_PORTAL !== 'true') {
+    console.log(`Portal url: ${config.portal}`)
+    processor.setPortal(config.portal)
+  } else if (process.env.DISABLE_ARCHIVE !== 'true') {
+    console.log(`Portal url: ${config.portal}`)
     processor.setGateway(config.gateway)
   } else {
-    console.log(`Archive disabled`)
+    console.log(`Portal disabled`)
   }
 
   return processor
@@ -124,6 +127,7 @@ let initialized = false
 export interface ChainConfig {
   chain: Chain
   gateway: string
+  portal: string
   endpoints: string[]
 }
 
@@ -131,6 +135,7 @@ export const chainConfigs = {
   [mainnet.id]: {
     chain: mainnet,
     gateway: 'https://v2.archive.subsquid.io/network/ethereum-mainnet',
+    portal: process.env.PORTAL_URL_ETHEREUM ?? 'https://portal.sqd.dev/datasets/ethereum-mainnet',
     endpoints: compact([
       process.env[process.env.RPC_ENV ?? 'RPC_ENDPOINT'],
       process.env[process.env.RPC_ENV_BACKUP ?? 'RPC_ETH_HTTP'],
@@ -139,6 +144,7 @@ export const chainConfigs = {
   [arbitrum.id]: {
     chain: arbitrum,
     gateway: 'https://v2.archive.subsquid.io/network/arbitrum-one',
+    portal: process.env.PORTAL_URL_ARBITRUM ?? 'https://portal.sqd.dev/datasets/arbitrum-one',
     endpoints: compact([
       process.env[process.env.RPC_ARBITRUM_ENV ?? 'RPC_ARBITRUM_ENDPOINT'],
       process.env[process.env.RPC_ARBITRUM_ENV_BACKUP ?? 'RPC_ARBITRUM_ONE_HTTP'],
@@ -147,6 +153,7 @@ export const chainConfigs = {
   [base.id]: {
     chain: base,
     gateway: 'https://v2.archive.subsquid.io/network/base-mainnet',
+    portal: process.env.PORTAL_URL_BASE ?? 'https://portal.sqd.dev/datasets/base-mainnet',
     endpoints: compact([
       process.env[process.env.RPC_BASE_ENV ?? 'RPC_BASE_ENDPOINT'],
       process.env[process.env.RPC_BASE_ENV_BACKUP ?? 'RPC_BASE_HTTP'],
@@ -155,6 +162,7 @@ export const chainConfigs = {
   [sonic.id]: {
     chain: sonic,
     gateway: 'https://v2.archive.subsquid.io/network/sonic-mainnet',
+    portal: process.env.PORTAL_URL_SONIC ?? 'https://portal.sqd.dev/datasets/sonic-mainnet',
     endpoints: compact([
       process.env[process.env.RPC_SONIC_ENV ?? 'RPC_SONIC_ENDPOINT'],
       process.env[process.env.RPC_SONIC_ENV_BACKUP ?? 'RPC_SONIC_MAINNET_HTTP'],
@@ -163,6 +171,7 @@ export const chainConfigs = {
   [optimism.id]: {
     chain: optimism,
     gateway: 'https://v2.archive.subsquid.io/network/optimism-mainnet',
+    portal: process.env.PORTAL_URL_OPTIMISM ?? 'https://portal.sqd.dev/datasets/optimism-mainnet',
     endpoints: compact([
       process.env[process.env.RPC_OPTIMISM_ENV ?? 'RPC_OPTIMISM_ENDPOINT'],
       process.env[process.env.RPC_OPTIMISM_ENV_BACKUP ?? 'RPC_OPTIMISM_HTTP'],
@@ -171,22 +180,16 @@ export const chainConfigs = {
   [bsc.id]: {
     chain: bsc,
     gateway: 'https://v2.archive.subsquid.io/network/binance-mainnet',
+    portal: process.env.PORTAL_URL_BSC ?? 'https://portal.sqd.dev/datasets/binance-mainnet',
     endpoints: compact([
       process.env[process.env.RPC_BSC_ENV ?? 'RPC_BSC_ENDPOINT'],
       process.env[process.env.RPC_BSC_ENV_BACKUP ?? 'RPC_BSC_HTTP'],
     ]),
   },
-  [plumeMainnet.id]: {
-    chain: plumeMainnet,
-    gateway: 'https://v2.archive.subsquid.io/network/plume',
-    endpoints: compact([
-      process.env[process.env.RPC_PLUME_ENV ?? 'RPC_PLUME_ENDPOINT'],
-      process.env[process.env.RPC_PLUME_ENV_BACKUP ?? 'RPC_PLUME_HTTP'],
-    ]),
-  },
   [hyperEvm.id]: {
     chain: hyperEvm,
     gateway: 'https://v2.archive.subsquid.io/network/hyperliquid-mainnet',
+    portal: process.env.PORTAL_URL_HYPEREVM ?? 'https://portal.sqd.dev/datasets/hyperliquid-mainnet',
     endpoints: compact([
       process.env[process.env.RPC_HYPEREVM_ENV ?? 'RPC_HYPEREVM_ENDPOINT'],
       process.env[process.env.RPC_HYPEREVM_ENV_BACKUP ?? 'RPC_HYPEREVM_HTTP'],
