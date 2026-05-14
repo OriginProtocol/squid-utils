@@ -12,33 +12,33 @@ type AnyFunc = AbiFunction<any, any>;
 type AggregateTuple<T extends AnyFunc = AnyFunc> = [func: T, address: string, args: T extends AnyFunc ? FunctionArguments<T> : never];
 export declare class Multicall extends ContractBase {
     static aggregate: AbiFunction<{
-        readonly calls: p.Codec<{
+        readonly calls: p.ArrayCodec<{
             readonly target: string;
             readonly callData: string | Uint8Array<ArrayBufferLike>;
-        }[], {
+        }, {
             readonly target: string;
             readonly callData: string;
-        }[]>;
-    }, {
+        }>;
+    }, p.StructCodec<{
         readonly blockNumber: p.Codec<number | bigint, bigint>;
-        readonly returnData: p.Codec<(string | Uint8Array<ArrayBufferLike>)[], string[]>;
-    }>;
+        readonly returnData: p.ArrayCodec<string | Uint8Array<ArrayBufferLike>, string>;
+    }>>;
     static tryAggregate: AbiFunction<{
         readonly requireSuccess: p.Codec<boolean, boolean>;
-        readonly calls: p.Codec<{
+        readonly calls: p.ArrayCodec<{
             readonly target: string;
             readonly callData: string | Uint8Array<ArrayBufferLike>;
-        }[], {
+        }, {
             readonly target: string;
             readonly callData: string;
-        }[]>;
-    }, p.Codec<{
+        }>;
+    }, p.ArrayCodec<{
         readonly success: boolean;
         readonly returnData: string | Uint8Array<ArrayBufferLike>;
-    }[], {
+    }, {
         readonly success: boolean;
         readonly returnData: string;
-    }[]>>;
+    }>>;
     aggregate<TF extends AnyFunc>(func: TF, address: string, calls: FunctionArguments<TF>[], paging?: number): Promise<FunctionReturn<TF>[]>;
     aggregate<TF extends AnyFunc>(func: TF, calls: (readonly [address: string, args: FunctionArguments<TF>])[], paging?: number): Promise<FunctionReturn<TF>[]>;
     aggregate(calls: AggregateTuple[], paging?: number): Promise<any[]>;
