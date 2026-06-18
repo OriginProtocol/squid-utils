@@ -3,13 +3,24 @@
   "version": "1.0.0",
   "description": "",
   "packageManager": "pnpm@10.24.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OriginProtocol/squid-utils.git"
+  },
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
     "lib/**/*"
   ],
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
   "scripts": {
     "build": "tsc",
+    "prepack": "pnpm run build",
+    "publish:dry-run": "pnpm publish --dry-run --no-git-checks",
+    "publish:github": "pnpm publish --registry https://npm.pkg.github.com --no-git-checks",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky install"
   },
@@ -21,6 +32,7 @@
     "@subsquid/evm-abi": "^1.0.0",
     "@subsquid/evm-codec": "^1.0.0",
     "@subsquid/evm-processor": "1.28.0-portal-api.721f49",
+    "@subsquid/rpc-client": "^4.14.0",
     "@subsquid/typeorm-store": "^1.9.1",
     "dayjs": "^1.11.13",
     "lodash": "^4.17.21",
