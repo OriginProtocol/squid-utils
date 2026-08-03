@@ -13,6 +13,7 @@ import { calculateBlockRate } from './calculateBlockRate'
 import { printStats } from './processing-stats'
 
 import './polyfills/rpc-issues'
+import { registerPortalUrl } from './polyfills/portal-api-key'
 import { Block, Context } from './types'
 
 dayjs.extend(duration)
@@ -71,9 +72,10 @@ export const createEvmBatchProcessor = (config: ChainConfig, options?: {
 
   if (process.env.DISABLE_PORTAL !== 'true') {
     console.log(`Portal url: ${config.portal}`)
+    registerPortalUrl(config.portal)
     processor.setPortal(config.portal)
   } else if (process.env.DISABLE_ARCHIVE !== 'true') {
-    console.log(`Portal url: ${config.portal}`)
+    console.log(`Gateway url: ${config.gateway}`)
     processor.setGateway(config.gateway)
   } else {
     console.log(`Portal disabled`)
@@ -131,11 +133,17 @@ export interface ChainConfig {
   endpoints: string[]
 }
 
+// The shared portal requires `SQD_API_KEY`; without a key we fall back to the public one.
+const portalUrl = (dataset: string) =>
+  process.env.SQD_API_KEY
+    ? `https://shared.portal.sqd.dev/datasets/${dataset}`
+    : `https://portal.sqd.dev/datasets/${dataset}`
+
 export const chainConfigs = {
   [mainnet.id]: {
     chain: mainnet,
     gateway: 'https://v2.archive.subsquid.io/network/ethereum-mainnet',
-    portal: process.env.PORTAL_URL_ETHEREUM ?? 'https://portal.sqd.dev/datasets/ethereum-mainnet',
+    portal: process.env.PORTAL_URL_ETHEREUM ?? portalUrl('ethereum-mainnet'),
     endpoints: compact([
       process.env[process.env.RPC_ENV ?? 'RPC_ENDPOINT'],
       process.env[process.env.RPC_ENV_BACKUP ?? 'RPC_ETH_HTTP'],
@@ -144,7 +152,7 @@ export const chainConfigs = {
   [arbitrum.id]: {
     chain: arbitrum,
     gateway: 'https://v2.archive.subsquid.io/network/arbitrum-one',
-    portal: process.env.PORTAL_URL_ARBITRUM ?? 'https://portal.sqd.dev/datasets/arbitrum-one',
+    portal: process.env.PORTAL_URL_ARBITRUM ?? portalUrl('arbitrum-one'),
     endpoints: compact([
       process.env[process.env.RPC_ARBITRUM_ENV ?? 'RPC_ARBITRUM_ENDPOINT'],
       process.env[process.env.RPC_ARBITRUM_ENV_BACKUP ?? 'RPC_ARBITRUM_ONE_HTTP'],
@@ -153,7 +161,7 @@ export const chainConfigs = {
   [base.id]: {
     chain: base,
     gateway: 'https://v2.archive.subsquid.io/network/base-mainnet',
-    portal: process.env.PORTAL_URL_BASE ?? 'https://portal.sqd.dev/datasets/base-mainnet',
+    portal: process.env.PORTAL_URL_BASE ?? portalUrl('base-mainnet'),
     endpoints: compact([
       process.env[process.env.RPC_BASE_ENV ?? 'RPC_BASE_ENDPOINT'],
       process.env[process.env.RPC_BASE_ENV_BACKUP ?? 'RPC_BASE_HTTP'],
@@ -162,7 +170,7 @@ export const chainConfigs = {
   [sonic.id]: {
     chain: sonic,
     gateway: 'https://v2.archive.subsquid.io/network/sonic-mainnet',
-    portal: process.env.PORTAL_URL_SONIC ?? 'https://portal.sqd.dev/datasets/sonic-mainnet',
+    portal: process.env.PORTAL_URL_SONIC ?? portalUrl('sonic-mainnet'),
     endpoints: compact([
       process.env[process.env.RPC_SONIC_ENV ?? 'RPC_SONIC_ENDPOINT'],
       process.env[process.env.RPC_SONIC_ENV_BACKUP ?? 'RPC_SONIC_MAINNET_HTTP'],
@@ -171,7 +179,7 @@ export const chainConfigs = {
   [optimism.id]: {
     chain: optimism,
     gateway: 'https://v2.archive.subsquid.io/network/optimism-mainnet',
-    portal: process.env.PORTAL_URL_OPTIMISM ?? 'https://portal.sqd.dev/datasets/optimism-mainnet',
+    portal: process.env.PORTAL_URL_OPTIMISM ?? portalUrl('optimism-mainnet'),
     endpoints: compact([
       process.env[process.env.RPC_OPTIMISM_ENV ?? 'RPC_OPTIMISM_ENDPOINT'],
       process.env[process.env.RPC_OPTIMISM_ENV_BACKUP ?? 'RPC_OPTIMISM_HTTP'],
@@ -180,7 +188,7 @@ export const chainConfigs = {
   [bsc.id]: {
     chain: bsc,
     gateway: 'https://v2.archive.subsquid.io/network/binance-mainnet',
-    portal: process.env.PORTAL_URL_BSC ?? 'https://portal.sqd.dev/datasets/binance-mainnet',
+    portal: process.env.PORTAL_URL_BSC ?? portalUrl('binance-mainnet'),
     endpoints: compact([
       process.env[process.env.RPC_BSC_ENV ?? 'RPC_BSC_ENDPOINT'],
       process.env[process.env.RPC_BSC_ENV_BACKUP ?? 'RPC_BSC_HTTP'],
@@ -189,7 +197,7 @@ export const chainConfigs = {
   [hyperEvm.id]: {
     chain: hyperEvm,
     gateway: 'https://v2.archive.subsquid.io/network/hyperliquid-mainnet',
-    portal: process.env.PORTAL_URL_HYPEREVM ?? 'https://portal.sqd.dev/datasets/hyperliquid-mainnet',
+    portal: process.env.PORTAL_URL_HYPEREVM ?? portalUrl('hyperliquid-mainnet'),
     endpoints: compact([
       process.env[process.env.RPC_HYPEREVM_ENV ?? 'RPC_HYPEREVM_ENDPOINT'],
       process.env[process.env.RPC_HYPEREVM_ENV_BACKUP ?? 'RPC_HYPEREVM_HTTP'],

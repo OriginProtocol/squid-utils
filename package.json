@@ -32,6 +32,7 @@
     "@subsquid/evm-abi": "^1.0.0",
     "@subsquid/evm-codec": "^1.0.0",
     "@subsquid/evm-processor": "1.28.0-portal-api.721f49",
+    "@subsquid/http-client": "^1.8.1",
     "@subsquid/rpc-client": "^4.14.0",
     "@subsquid/typeorm-store": "^1.9.1",
     "dayjs": "^1.11.13",
