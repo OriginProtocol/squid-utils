@@ -47,6 +47,27 @@ const defined = <T extends object>(obj: T): T | undefined => {
 }
 
 /**
+ * `defined()` plus the gateway processor's `mapRequest` normalization —
+ * lowercase every string inside an array-valued filter field, which is where
+ * addresses, topics and sighashes live.
+ *
+ * The portal matches hex exactly and evm-stream normalizes nothing, so a
+ * checksummed address in a registration matches zero blocks and fails silently.
+ * The gateway did this for free; doing it here is what keeps that guarantee for
+ * registrations that don't go through `logFilter`/`traceFilter`/
+ * `transactionFilter` (which lowercase on their own).
+ */
+const where = <T extends object>(obj: T): T | undefined =>
+  defined(
+    Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => [
+        key,
+        Array.isArray(value) ? value.map((v) => (typeof v === 'string' ? v.toLowerCase() : v)) : value,
+      ]),
+    ) as T,
+  )
+
+/**
  * A `DataSourceBuilder` wearing the gateway-era registration API.
  *
  * Downstream `setup(p)` bodies register flat request objects — what
@@ -108,7 +129,7 @@ export class PortalDataSourceBuilder implements ProcessorRegistrar {
             registration.options
           source.addLog({
             range,
-            where: defined({ address, topic0, topic1, topic2, topic3 }),
+            where: where({ address, topic0, topic1, topic2, topic3 }),
             include: defined({ transaction, transactionTraces, transactionLogs, transactionStateDiffs }),
           })
           break
@@ -117,7 +138,7 @@ export class PortalDataSourceBuilder implements ProcessorRegistrar {
           const { to, from, sighash, type, logs, traces, stateDiffs, range } = registration.options
           source.addTransaction({
             range,
-            where: defined({ to, from, sighash, type }),
+            where: where({ to, from, sighash, type }),
             include: defined({ logs, traces, stateDiffs }),
           })
           break
@@ -127,7 +148,7 @@ export class PortalDataSourceBuilder implements ProcessorRegistrar {
             registration.options
           source.addTrace({
             range,
-            where: defined({ type, createFrom, callTo, callFrom, callSighash, suicideRefundAddress, rewardAuthor }),
+            where: where({ type, createFrom, callTo, callFrom, callSighash, suicideRefundAddress, rewardAuthor }),
             include: defined({ transaction, transactionLogs, subtraces, parents }),
           })
           break
@@ -136,7 +157,7 @@ export class PortalDataSourceBuilder implements ProcessorRegistrar {
           const { address, key, kind, transaction, range } = registration.options
           source.addStateDiff({
             range,
-            where: defined({ address, key, kind }),
+            where: where({ address, key, kind }),
             include: defined({ transaction }),
           })
           break
