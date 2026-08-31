@@ -8,49 +8,15 @@ import { arbitrum, base, bsc, hyperEvm, mainnet, optimism, sonic } from 'viem/ch
 
 import { EvmBatchProcessor, FieldSelection } from '@subsquid/evm-processor'
 import { TypeormDatabase } from '@subsquid/typeorm-store'
-import { blockFrequencyTracker } from './blockFrequencyUpdater'
-import { calculateBlockRate } from './calculateBlockRate'
-import { printStats } from './processing-stats'
+import { DEFAULT_FIELDS } from './fields'
+import { createSquidHandler } from './handler'
 
 import './polyfills/rpc-issues'
 import { registerPortalUrl } from './polyfills/portal-api-key'
-import { Block, Context } from './types'
+import { Context, GatewayContext, Processor } from './types'
 
 dayjs.extend(duration)
 dayjs.extend(utc)
-
-const DEFAULT_FIELDS = {
-  transaction: {
-    from: true,
-    to: true,
-    hash: true,
-    gasUsed: true,
-    gas: true,
-    value: true,
-    sighash: true,
-    input: true,
-    status: true,
-    effectiveGasPrice: true,
-  },
-  log: {
-    transactionHash: true,
-    topics: true,
-    data: true,
-  },
-  trace: {
-    callFrom: true,
-    callTo: true,
-    callSighash: true,
-    callValue: true,
-    callInput: true,
-    createResultAddress: true,
-    suicideRefundAddress: true,
-    suicideAddress: true,
-    suicideBalance: true,
-    error: true,
-    revertReason: true,
-  },
-} as const
 
 export const createEvmBatchProcessor = (config: ChainConfig, options?: {
   fields?: FieldSelection
@@ -95,14 +61,6 @@ export interface SquidProcessor {
   fields?: FieldSelection
 }
 
-export interface Processor {
-  name?: string
-  from?: number
-  initialize?: (ctx: Context) => Promise<void> // To only be run once per `sqd process`.
-  setup?: (p: ReturnType<typeof createEvmBatchProcessor>, chain?: Chain) => void
-  process: (ctx: Context) => Promise<void>
-}
-
 export const defineSquidProcessor = (p: SquidProcessor) => p
 export const defineProcessor = (p: Processor) => p
 export const joinProcessors = (name: string, processors: Processor[]): Processor => {
@@ -115,16 +73,14 @@ export const joinProcessors = (name: string, processors: Processor[]): Processor
     initialize: async (ctx: Context) => {
       await Promise.all(processors.map(p => p.initialize?.(ctx)))
     },
-    setup: (evmBatchProcessor: ReturnType<typeof createEvmBatchProcessor>, chain?: Chain) => {
-      processors.forEach(p => p.setup?.(evmBatchProcessor, chain))
+    setup: (registrar, chain?: Chain) => {
+      processors.forEach(p => p.setup?.(registrar, chain))
     },
     process: async (ctx: Context) => {
       await Promise.all(processors.map(p => p.process(ctx)))
     }
   };
 };
-
-let initialized = false
 
 export interface ChainConfig {
   chain: Chain
@@ -205,165 +161,101 @@ export const chainConfigs = {
   },
 } as const
 
-export const run = async ({ fromNow, chainId = 1, stateSchema, processors, postProcessors, validators, postValidation, fields }: SquidProcessor) => {
-  if (!fromNow) {
-    assert(!processors.find((p) => p.from === undefined), 'All processors must have a `from` defined')
-  }
-
-  if (process.env.PROCESSOR) {
-    processors = processors.filter((p) => p.name?.includes(process.env.PROCESSOR!))
-  }
-  if (process.env.PROCESSOR) {
-    postProcessors = postProcessors?.filter((p) => p.name?.includes(process.env.PROCESSOR!))
-  }
-
-  console.log('Processors:\n  -', processors.map((p) => p.name).join('\n  - '))
-
-  const config = chainConfigs[chainId]
-  if (!config) throw new Error('No chain configuration found.')
-  // console.log('env', JSON.stringify(process.env, null, 2))
-  // console.log('config', JSON.stringify(config, null, 2))
-  const evmBatchProcessor = createEvmBatchProcessor(config, { fields })
-
-
+/**
+ * Resolve the block to start from, honouring `BLOCK_FROM`/`BLOCK_TO`,
+ * `fromNow`, and the height already persisted in `stateSchema`.
+ * Shared by both SDK generations.
+ */
+export const resolveBlockRange = async ({
+  config,
+  stateSchema,
+  fromNow,
+  processors,
+}: {
+  config: ChainConfig
+  stateSchema: string
+  fromNow?: boolean
+  processors: Processor[]
+}) => {
   const client = createPublicClient({ chain: config.chain, transport: http(config.endpoints[0]) })
   const latestBlock = await client.getBlock()
 
-  const database = new TypeormDatabase({ supportHotBlocks: true, stateSchema })
-
   // In order to resume from the last processed block while having no `from` block declared,
   //   we must pull the state and use that as our `from` block.
+  const database = new TypeormDatabase({ supportHotBlocks: true, stateSchema })
   const databaseState = await database.connect()
   const latestHeight = databaseState.height
   await database.disconnect()
 
-  let from = [...processors, ...(postProcessors ?? [])].reduce((min, p) => (p.from && p.from < min ? p.from : min), fromNow ? latestHeight : Number(latestBlock.number))
+  let from = processors.reduce(
+    (min, p) => (p.from && p.from < min ? p.from : min),
+    fromNow ? latestHeight : Number(latestBlock.number),
+  )
   if (from === -1 && fromNow) {
     from = Number(latestBlock.number)
   }
 
-  from = process.env.BLOCK_FROM ? Number(process.env.BLOCK_FROM) : from
-  const to = process.env.BLOCK_TO ? Number(process.env.BLOCK_TO) : undefined
-  evmBatchProcessor.setBlockRange({
-    from,
-    to,
+  return {
+    from: process.env.BLOCK_FROM ? Number(process.env.BLOCK_FROM) : from,
+    to: process.env.BLOCK_TO ? Number(process.env.BLOCK_TO) : undefined,
+  }
+}
+
+/**
+ * Select the processors this container should run, honouring `PROCESSOR`.
+ * Shared by both SDK generations.
+ */
+export const selectProcessors = ({ fromNow, processors, postProcessors }: SquidProcessor) => {
+  if (!fromNow) {
+    assert(!processors.find((p) => p.from === undefined), 'All processors must have a `from` defined')
+  }
+  if (process.env.PROCESSOR) {
+    processors = processors.filter((p) => p.name?.includes(process.env.PROCESSOR!))
+    postProcessors = postProcessors?.filter((p) => p.name?.includes(process.env.PROCESSOR!))
+  }
+  console.log('Processors:\n  -', processors.map((p) => p.name).join('\n  - '))
+  return { processors, postProcessors }
+}
+
+export const run = async (squidProcessor: SquidProcessor) => {
+  const { fromNow, chainId = 1, stateSchema, validators, postValidation, fields } = squidProcessor
+  const { processors, postProcessors } = selectProcessors(squidProcessor)
+
+  const config = chainConfigs[chainId]
+  if (!config) throw new Error('No chain configuration found.')
+  const evmBatchProcessor = createEvmBatchProcessor(config, { fields })
+
+  const { from, to } = await resolveBlockRange({
+    config,
+    stateSchema,
+    fromNow,
+    processors: [...processors, ...(postProcessors ?? [])],
   })
+  evmBatchProcessor.setBlockRange({ from, to })
+
   processors.forEach((p) => p.setup?.(evmBatchProcessor, config.chain))
   postProcessors?.forEach((p) => p.setup?.(evmBatchProcessor, config.chain))
 
   const evmBatchProcessorWithRequests: { requests: any[] } = evmBatchProcessor as any
   evmBatchProcessorWithRequests.requests = uniqWith(evmBatchProcessorWithRequests.requests, isEqual)
 
-  const frequencyTracker = blockFrequencyTracker({ from })
-  let contextTime = Date.now()
-  const averageTimeMap = new Map<string, [number, number]>()
+  const handler = createSquidHandler({
+    chain: config.chain,
+    from,
+    processors,
+    postProcessors,
+    validators,
+    postValidation,
+  })
+
   evmBatchProcessor.run(
     new TypeormDatabase({
       stateSchema,
       supportHotBlocks: true,
       isolationLevel: 'READ COMMITTED',
     }),
-    async (_ctx) => {
-      const ctx = _ctx as Context
-      try {
-        ctx.chain = config.chain
-        ctx.__state = new Map<string, unknown>()
-        if (ctx.blocks.length >= 1) {
-          ctx.blockRate = await calculateBlockRate(ctx)
-          // ctx.log.info(`Block rate: ${ctx.blockRate}`)
-        }
-        ctx.blocksWithContent = ctx.blocks.filter(
-          (b) => b.logs.length > 0 || b.traces.length > 0 || b.transactions.length > 0,
-        )
-        ctx.frequencyBlocks = ctx.blocks.filter((b) => frequencyTracker(ctx, b))
-        ctx.lastBlockPerDay = new Map<string, Block>()
-        for (const block of ctx.blocks) {
-          if (!block.header.timestamp) continue
-          ctx.lastBlockPerDay.set(new Date(block.header.timestamp).toISOString().slice(0, 10), block)
-        }
-        ctx.latestBlockOfDay = (block: Block) => {
-          const date = new Date(block.header.timestamp).toISOString().slice(0, 10)
-          return ctx.lastBlockPerDay.get(date) === block || ctx.blocks.at(-1) === block
-        }
-
-
-        let start: number
-        const time = (name: string) => () => {
-          const timedata = averageTimeMap.get(name) ?? [0, 0]
-          timedata[0] += Date.now() - start
-          timedata[1] += 1
-          averageTimeMap.set(name, timedata)
-          const message = `${name} ${timedata[1]}x avg ${(timedata[0] / timedata[1]).toFixed(0)}ms`
-          return () => ctx.log.info(message)
-        }
-
-        // Initialization Run
-        if (!initialized) {
-          initialized = true
-          ctx.log.info(`initializing`)
-          start = Date.now()
-          const times = await Promise.all([
-            ...processors
-              .filter((p) => p.initialize)
-              .map((p, index) =>
-                p.initialize!(ctx).then(time(p.name ? `initializing ${p.name}` : `initializing processor-${index}`)),
-              ),
-            ...(postProcessors ?? [])
-              .filter((p) => p.initialize)
-              .map((p, index) =>
-                p.initialize!(ctx).then(
-                  time(p.name ? `initializing ${p.name}` : `initializing postProcessors-${index}`),
-                ),
-              ),
-          ])
-          times.forEach((t) => t())
-        }
-
-        // Main Processing Run
-        start = Date.now()
-        const times = await Promise.all(
-          processors.map((p, index) => p.process(ctx).then(time(p.name ?? `processor-${index}`))),
-        )
-        if (process.env.DEBUG_PERF === 'true') {
-          ctx.log.info('===== Processor Times =====')
-          times.forEach((t) => t())
-        }
-
-        if (postProcessors) {
-          // Post Processing Run
-          start = Date.now()
-          const postTimes = await Promise.all(
-            postProcessors.map((p, index) => p.process(ctx).then(time(p.name ?? `postProcessor-${index}`))),
-          )
-          if (process.env.DEBUG_PERF === 'true') {
-            ctx.log.info('===== Post Processor Times =====')
-            postTimes.forEach((t) => t())
-          }
-        }
-
-        if (validators) {
-          // Validation Run
-          start = Date.now()
-          const validatorTimes = await Promise.all(
-            validators.map((p, index) => p.process(ctx).then(time(p.name ?? `validator-${index}`))),
-          )
-          if (process.env.DEBUG_PERF === 'true') {
-            ctx.log.info('===== Validator Times =====')
-            validatorTimes.forEach((t) => t())
-          }
-        }
-        if (postValidation) {
-          await postValidation(ctx)
-        }
-      } finally {
-        printStats(ctx)
-        if (process.env.DEBUG_PERF === 'true') {
-          ctx.log.info(
-            `===== End of Context ===== (${Date.now() - contextTime}ms, ${ctx.blocks.at(-1)?.header.height})`,
-          )
-        }
-        contextTime = Date.now()
-      }
-    },
+    // The gateway-era context carries the same decorations under different
+    // generic parameters; `createSquidHandler` only reads what both provide.
+    async (ctx) => handler(ctx as GatewayContext as unknown as Context),
   )
 }

@@ -1,6 +1,10 @@
-// Attach `SQD_API_KEY` to portal requests.
+// Attach `SQD_API_KEY` to gateway-path portal requests.
+//
 // The portal-api build of @subsquid/evm-processor constructs the portal's HttpClient
-// internally with a fixed set of headers, so `setPortal()` gives us no way to pass one.
+// internally with a fixed set of headers (`getArchiveDataSource` in processor.js), so its
+// `setPortal()` gives us no way to pass one. Only `createEvmBatchProcessor` registers a url
+// here; the portal path passes the key natively through
+// `setPortal({url, http: {headers}})` and does not depend on this patch.
 import { HttpClient } from '@subsquid/http-client'
 
 const portalUrls = new Set<string>()
