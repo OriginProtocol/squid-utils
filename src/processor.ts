@@ -7,6 +7,7 @@ import { Chain, createPublicClient, http } from 'viem'
 import { arbitrum, base, bsc, hyperEvm, mainnet, optimism, sonic } from 'viem/chains'
 
 import { EvmBatchProcessor, FieldSelection } from '@subsquid/evm-processor'
+import { PortalClient } from '@subsquid/portal-client'
 import { TypeormDatabase } from '@subsquid/typeorm-store'
 import { DEFAULT_FIELDS } from './fields'
 import { createSquidHandler } from './handler'
@@ -59,6 +60,12 @@ export interface SquidProcessor {
   validators?: Pick<Processor, 'process' | 'name'>[]
   postValidation?: (ctx: Context) => Promise<void>
   fields?: FieldSelection
+  /**
+   * Portal path only. Supply a client — typically `createPortalClient(config)`
+   * wrapped by the caller — instead of letting `runPortal()` build its own.
+   * Ignored by the gateway `run()` path, whose SDK takes only a URL.
+   */
+  portalClient?: PortalClient
 }
 
 export const defineSquidProcessor = (p: SquidProcessor) => p

@@ -9,7 +9,7 @@ import {
   FieldSelection as PortalFieldSelection,
 } from '@subsquid/evm-stream'
 import { createLogger } from '@subsquid/logger'
-import { PortalClientOptions } from '@subsquid/portal-client'
+import { PortalClient, PortalClientOptions } from '@subsquid/portal-client'
 import { RpcClient } from '@subsquid/rpc-client'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { StreamRequest } from '@subsquid/util-internal-data-source'
@@ -59,7 +59,7 @@ export class PortalDataSourceBuilder implements ProcessorRegistrar {
   private blockRange?: Range
 
   constructor(
-    private portal: PortalClientOptions,
+    private portal: PortalClientOptions | PortalClient,
     private fields: PortalFieldSelection,
   ) {}
 
@@ -173,18 +173,34 @@ const clampStreamStart = (
 }
 
 /**
- * Portal data source for a chain. `SQD_API_KEY` rides along as `x-api-key`
- * natively, so this path needs none of `polyfills/portal-api-key.ts` — that
- * patch exists only because the gateway path's SDK hardcodes its headers.
+ * The `PortalClient` this path would build for a chain. `SQD_API_KEY` rides
+ * along as `x-api-key` natively, so this needs none of
+ * `polyfills/portal-api-key.ts` — that patch exists only because the gateway
+ * path's SDK hardcodes its headers.
+ *
+ * Exported so a consumer can build the standard client, wrap the *instance*
+ * (caching, metrics), and hand it back via `SquidProcessor.portalClient`.
+ * Wrapping an instance is the only safe way to do it: the dependency tree can
+ * resolve several physically distinct `portal-client` copies, so a
+ * `PortalClient.prototype` patch may well attach to a class nobody here
+ * instantiates.
  */
-export const createPortalDataSource = (config: ChainConfig, options?: { fields?: GatewayFieldSelection }) => {
-  console.log(`Portal url: ${config.portal}`)
+export const createPortalClient = (config: ChainConfig) => {
   const apiKey = process.env.SQD_API_KEY
+  return new PortalClient({
+    url: config.portal,
+    http: apiKey ? { headers: { 'x-api-key': apiKey } } : undefined,
+  })
+}
+
+/** Portal data source for a chain, optionally over a caller-supplied client. */
+export const createPortalDataSource = (
+  config: ChainConfig,
+  options?: { fields?: GatewayFieldSelection; client?: PortalClient },
+) => {
+  console.log(`Portal url: ${config.portal}`)
   return new PortalDataSourceBuilder(
-    {
-      url: config.portal,
-      http: apiKey ? { headers: { 'x-api-key': apiKey } } : undefined,
-    },
+    options?.client ?? createPortalClient(config),
     // No implicit merge in the Portal SDK: whatever the caller asks for is
     // layered onto the fields the gateway-era SDK used to add for free.
     mergeFieldSelection(IMPLICIT_FIELDS, (options?.fields ?? DEFAULT_FIELDS) as PortalFieldSelection),
@@ -200,13 +216,13 @@ export const createPortalDataSource = (config: ChainConfig, options?: { fields?:
  * dataset and stays on `run()`.
  */
 export const runPortal = async (squidProcessor: SquidProcessor) => {
-  const { fromNow, chainId = 1, stateSchema, validators, postValidation, fields } = squidProcessor
+  const { fromNow, chainId = 1, stateSchema, validators, postValidation, fields, portalClient } = squidProcessor
   const { processors, postProcessors } = selectProcessors(squidProcessor)
 
   const config = chainConfigs[chainId]
   if (!config) throw new Error('No chain configuration found.')
 
-  const builder = createPortalDataSource(config, { fields })
+  const builder = createPortalDataSource(config, { fields, client: portalClient })
 
   const { from, to } = await resolveBlockRange({
     config,
