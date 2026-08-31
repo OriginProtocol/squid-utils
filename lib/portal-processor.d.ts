@@ -1,6 +1,6 @@
 import { FieldSelection as GatewayFieldSelection } from '@subsquid/evm-processor';
 import { EVMDataSource, FieldSelection as PortalFieldSelection } from '@subsquid/evm-stream';
-import { PortalClientOptions } from '@subsquid/portal-client';
+import { PortalClient, PortalClientOptions } from '@subsquid/portal-client';
 import { Range } from '@subsquid/util-internal-range';
 import { PORTAL_DEFAULT_FIELDS, PortalFields } from './fields';
 import { ChainConfig, SquidProcessor } from './processor';
@@ -19,7 +19,7 @@ export declare class PortalDataSourceBuilder implements ProcessorRegistrar {
     private fields;
     private registrations;
     private blockRange?;
-    constructor(portal: PortalClientOptions, fields: PortalFieldSelection);
+    constructor(portal: PortalClientOptions | PortalClient, fields: PortalFieldSelection);
     includeAllBlocks(range?: Range): this;
     addLog(options: LogRequest & {
         range?: Range;
@@ -37,12 +37,23 @@ export declare class PortalDataSourceBuilder implements ProcessorRegistrar {
     build(): EVMDataSource<PortalFields>;
 }
 /**
- * Portal data source for a chain. `SQD_API_KEY` rides along as `x-api-key`
- * natively, so this path needs none of `polyfills/portal-api-key.ts` — that
- * patch exists only because the gateway path's SDK hardcodes its headers.
+ * The `PortalClient` this path would build for a chain. `SQD_API_KEY` rides
+ * along as `x-api-key` natively, so this needs none of
+ * `polyfills/portal-api-key.ts` — that patch exists only because the gateway
+ * path's SDK hardcodes its headers.
+ *
+ * Exported so a consumer can build the standard client, wrap the *instance*
+ * (caching, metrics), and hand it back via `SquidProcessor.portalClient`.
+ * Wrapping an instance is the only safe way to do it: the dependency tree can
+ * resolve several physically distinct `portal-client` copies, so a
+ * `PortalClient.prototype` patch may well attach to a class nobody here
+ * instantiates.
  */
+export declare const createPortalClient: (config: ChainConfig) => PortalClient;
+/** Portal data source for a chain, optionally over a caller-supplied client. */
 export declare const createPortalDataSource: (config: ChainConfig, options?: {
     fields?: GatewayFieldSelection;
+    client?: PortalClient;
 }) => PortalDataSourceBuilder;
 /**
  * Run a squid on the Portal SDK — `@subsquid/evm-stream` +

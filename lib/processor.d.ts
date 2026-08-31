@@ -1,5 +1,6 @@
 import { Chain } from 'viem';
 import { EvmBatchProcessor, FieldSelection } from '@subsquid/evm-processor';
+import { PortalClient } from '@subsquid/portal-client';
 import './polyfills/rpc-issues';
 import { Context, Processor } from './types';
 export declare const createEvmBatchProcessor: (config: ChainConfig, options?: {
@@ -45,6 +46,12 @@ export interface SquidProcessor {
     validators?: Pick<Processor, 'process' | 'name'>[];
     postValidation?: (ctx: Context) => Promise<void>;
     fields?: FieldSelection;
+    /**
+     * Portal path only. Supply a client — typically `createPortalClient(config)`
+     * wrapped by the caller — instead of letting `runPortal()` build its own.
+     * Ignored by the gateway `run()` path, whose SDK takes only a URL.
+     */
+    portalClient?: PortalClient;
 }
 export declare const defineSquidProcessor: (p: SquidProcessor) => SquidProcessor;
 export declare const defineProcessor: (p: Processor) => Processor;
