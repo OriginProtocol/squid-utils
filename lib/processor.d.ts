@@ -1,7 +1,8 @@
 import { Chain } from 'viem';
 import { EvmBatchProcessor, FieldSelection } from '@subsquid/evm-processor';
+import { PortalClient } from '@subsquid/portal-client';
 import './polyfills/rpc-issues';
-import { Context } from './types';
+import { Context, Processor } from './types';
 export declare const createEvmBatchProcessor: (config: ChainConfig, options?: {
     fields?: FieldSelection;
 }) => EvmBatchProcessor<{
@@ -45,13 +46,12 @@ export interface SquidProcessor {
     validators?: Pick<Processor, 'process' | 'name'>[];
     postValidation?: (ctx: Context) => Promise<void>;
     fields?: FieldSelection;
-}
-export interface Processor {
-    name?: string;
-    from?: number;
-    initialize?: (ctx: Context) => Promise<void>;
-    setup?: (p: ReturnType<typeof createEvmBatchProcessor>, chain?: Chain) => void;
-    process: (ctx: Context) => Promise<void>;
+    /**
+     * Portal path only. Supply a client — typically `createPortalClient(config)`
+     * wrapped by the caller — instead of letting `runPortal()` build its own.
+     * Ignored by the gateway `run()` path, whose SDK takes only a URL.
+     */
+    portalClient?: PortalClient;
 }
 export declare const defineSquidProcessor: (p: SquidProcessor) => SquidProcessor;
 export declare const defineProcessor: (p: Processor) => Processor;
@@ -963,4 +963,26 @@ export declare const chainConfigs: {
         readonly endpoints: string[];
     };
 };
-export declare const run: ({ fromNow, chainId, stateSchema, processors, postProcessors, validators, postValidation, fields }: SquidProcessor) => Promise<void>;
+/**
+ * Resolve the block to start from, honouring `BLOCK_FROM`/`BLOCK_TO`,
+ * `fromNow`, and the height already persisted in `stateSchema`.
+ * Shared by both SDK generations.
+ */
+export declare const resolveBlockRange: ({ config, stateSchema, fromNow, processors, }: {
+    config: ChainConfig;
+    stateSchema: string;
+    fromNow?: boolean;
+    processors: Processor[];
+}) => Promise<{
+    from: number;
+    to: number | undefined;
+}>;
+/**
+ * Select the processors this container should run, honouring `PROCESSOR`.
+ * Shared by both SDK generations.
+ */
+export declare const selectProcessors: ({ fromNow, processors, postProcessors }: SquidProcessor) => {
+    processors: Processor[];
+    postProcessors: Processor[] | undefined;
+};
+export declare const run: (squidProcessor: SquidProcessor) => Promise<void>;

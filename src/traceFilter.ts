@@ -41,7 +41,12 @@ export const traceFilter = (filter: TraceFilterParams) => {
       if (filter.type && !filter.type.includes(trace.type)) return false
       if (filter.callFrom && trace.type === 'call' && !filter.callFrom.includes(trace.action.from.toLowerCase())) return false
       if (filter.callTo && trace.type === 'call' && !filter.callTo.includes(trace.action.to.toLowerCase())) return false
-      if (filter.callSighash && trace.type === 'call' && !filter.callSighash.includes(trace.action.sighash))
+      // `sighash` is absent on calls with less than 4 bytes of input.
+      if (
+        filter.callSighash &&
+        trace.type === 'call' &&
+        (!trace.action.sighash || !filter.callSighash.includes(trace.action.sighash))
+      )
         return false
       if (
         filter.suicideRefundAddress &&

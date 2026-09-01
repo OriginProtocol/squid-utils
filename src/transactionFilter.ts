@@ -39,7 +39,8 @@ export const transactionFilter = (filter: TransactionFilter) => {
       if (filter.to && (!transaction.to || !filter.to.includes(transaction.to))) {
         return false
       }
-      if (filter.sighash && !filter.sighash.includes(transaction.sighash)) {
+      // `sighash` is absent on transactions with less than 4 bytes of input.
+      if (filter.sighash && (!transaction.sighash || !filter.sighash.includes(transaction.sighash))) {
         return false
       }
       if (

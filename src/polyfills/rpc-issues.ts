@@ -14,6 +14,36 @@ const getMethodCUCost = (method: string): number => {
   return RPC_CU_COSTS[method] ?? DEFAULT_CU_COST;
 };
 
+/**
+ * The portal's `/stream` hands us a block a few hundred ms before the RPC node
+ * has it, so a contract read at the head block can come back "block not found".
+ * The gateway path never saw this, because RPC head-polling *was* the ingestion
+ * source — a block could not arrive ahead of the node it came from.
+ *
+ * Retry briefly, then give up: the gap is sub-second, so a block still missing
+ * after this window is a real problem (a reorg, or a node genuinely behind) and
+ * must surface rather than be papered over.
+ */
+const BLOCK_NOT_FOUND_RETRIES = 10
+const BLOCK_NOT_FOUND_RETRY_MS = 150
+
+const isBlockNotFound = (err: any) =>
+  err != null &&
+  (err.code === -32001 || err.code === -32000) &&
+  typeof err.message === 'string' &&
+  /block not found|header not found|unknown block|missing trie node/i.test(err.message)
+
+const callWithHeadRetry = async function (this: any, method: string, params?: any[], options?: any) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await this._call(method, params, options)
+    } catch (err) {
+      if (attempt >= BLOCK_NOT_FOUND_RETRIES || !isBlockNotFound(err)) throw err
+      await new Promise((resolve) => setTimeout(resolve, BLOCK_NOT_FOUND_RETRY_MS))
+    }
+  }
+}
+
 RpcClient.prototype.call = async function <T = any>(
   method: string,
   params?: any[],
@@ -30,8 +60,8 @@ RpcClient.prototype.call = async function <T = any>(
     processingStats.ethCallCounts.set(callMethod, count + 1);
   }
 
-  const response = await (this as any)._call(method, params, options);
-  
+  const response = await callWithHeadRetry.call(this, method, params, options);
+
   if (method === 'debug_traceBlockByHash') {
     fixSelfDestructs(response);
   }
@@ -48,8 +78,19 @@ RpcClient.prototype.batchCall = async function <T = any>(batch: RpcCall[], optio
   
   processingStats.rpcCalls += batch.length;
   
-  const response = await (this as any)._batchCall(batch, options);
-  
+  // Same head race as `call` — multicall reads at the head block hit it too.
+  let response: any
+  for (let attempt = 0; ; attempt++) {
+    try {
+      response = await (this as any)._batchCall(batch, options)
+      break
+    } catch (err) {
+      if (attempt >= BLOCK_NOT_FOUND_RETRIES || !isBlockNotFound(err)) throw err
+      await new Promise((resolve) => setTimeout(resolve, BLOCK_NOT_FOUND_RETRY_MS))
+    }
+  }
+
+
   for (let i = 0; i < batch.length; i++) {
     if (batch[i].method === 'debug_traceBlockByHash') {
       fixSelfDestructs(response[i]);
