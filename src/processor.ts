@@ -8,12 +8,14 @@ import { arbitrum, base, bsc, hyperEvm, mainnet, optimism, sonic } from 'viem/ch
 
 import { EvmBatchProcessor, FieldSelection } from '@subsquid/evm-processor'
 import { PortalClient } from '@subsquid/portal-client'
-import { TypeormDatabase } from '@subsquid/typeorm-store'
 import { DEFAULT_FIELDS } from './fields'
 import { createSquidHandler } from './handler'
 
 import './polyfills/rpc-issues'
 import { registerPortalUrl } from './polyfills/portal-api-key'
+// Raises `work_mem` for the transaction `repairOrphans` runs in, keeping its
+// `NOT IN` sweeps on the hashed-SubPlan side of the planner's cliff.
+import { createTypeormDatabase } from './polyfills/repair-orphans-work-mem'
 import { Context, GatewayContext, Processor } from './types'
 
 dayjs.extend(duration)
@@ -189,7 +191,7 @@ export const resolveBlockRange = async ({
 
   // In order to resume from the last processed block while having no `from` block declared,
   //   we must pull the state and use that as our `from` block.
-  const database = new TypeormDatabase({ supportHotBlocks: true, stateSchema })
+  const database = createTypeormDatabase({ supportHotBlocks: true, stateSchema })
   const databaseState = await database.connect()
   const latestHeight = databaseState.height
   await database.disconnect()
@@ -256,7 +258,7 @@ export const run = async (squidProcessor: SquidProcessor) => {
   })
 
   evmBatchProcessor.run(
-    new TypeormDatabase({
+    createTypeormDatabase({
       stateSchema,
       supportHotBlocks: true,
       isolationLevel: 'READ COMMITTED',
