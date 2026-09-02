@@ -38,7 +38,7 @@ jobs:
             echo "Tag must be a semantic version prefixed with v (for example, v1.2.3)."
             exit 1
           fi
-          pnpm version "$VERSION" --no-git-tag-version
+          pnpm version "$VERSION" --no-git-tag-version --allow-same-version
 
       - name: Build package
         run: pnpm run build
