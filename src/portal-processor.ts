@@ -11,7 +11,7 @@ import {
 import { createLogger } from '@subsquid/logger'
 import { PortalClient, PortalClientOptions } from '@subsquid/portal-client'
 import { RpcClient } from '@subsquid/rpc-client'
-import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
+import { Store } from '@subsquid/typeorm-store'
 import { StreamRequest } from '@subsquid/util-internal-data-source'
 import { Range } from '@subsquid/util-internal-range'
 
@@ -23,6 +23,10 @@ import { ChainConfig, SquidProcessor, chainConfigs, resolveBlockRange, selectPro
 // correctness fix. The portal path constructs its own `RpcClient`, so this has
 // to be applied here too.
 import './polyfills/rpc-issues'
+// Raises `work_mem` for `repairOrphans`. This path's deeper hot window (portal
+// finality, not a fixed 50 confirmations) is what pushed the sweep over the
+// planner's cliff, but both paths construct a TypeormDatabase and both get it.
+import { createTypeormDatabase } from './polyfills/repair-orphans-work-mem'
 import {
   Block,
   Context,
@@ -282,7 +286,7 @@ export const runPortal = async (squidProcessor: SquidProcessor) => {
     dataSource,
     // `supportHotBlocks: true` is what selects the portal's live `/stream`
     // over `/finalized` — the entire payoff of this path.
-    new TypeormDatabase({
+    createTypeormDatabase({
       stateSchema,
       supportHotBlocks: true,
       isolationLevel: 'READ COMMITTED',
