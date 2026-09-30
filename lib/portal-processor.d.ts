@@ -1,6 +1,7 @@
 import { FieldSelection as GatewayFieldSelection } from '@subsquid/evm-processor';
 import { EVMDataSource, FieldSelection as PortalFieldSelection } from '@subsquid/evm-stream';
 import { PortalClient, PortalClientOptions } from '@subsquid/portal-client';
+import { RpcClient } from '@subsquid/rpc-client';
 import { Range } from '@subsquid/util-internal-range';
 import { PORTAL_DEFAULT_FIELDS, PortalFields } from './fields';
 import { ChainConfig, SquidProcessor } from './processor';
@@ -55,6 +56,7 @@ export declare const createPortalDataSource: (config: ChainConfig, options?: {
     fields?: GatewayFieldSelection;
     client?: PortalClient;
 }) => PortalDataSourceBuilder;
+export declare const createPortalRpcClient: (url: string) => RpcClient;
 /**
  * Run a squid on the Portal SDK — `@subsquid/evm-stream` +
  * `@subsquid/batch-processor`, consuming the portal's real-time `/stream`

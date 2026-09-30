@@ -233,6 +233,31 @@ export const createPortalDataSource = (
 }
 
 /**
+ * Without `requestTimeout` the RPC client waits forever on a request the provider never
+ * answers (the rpc-client default is 0 = no timeout), while the batch transaction stays
+ * open. Postgres then kills the connection on `idle_in_transaction_session_timeout`
+ * (10 min) and the processor restarts on `QueryRunnerAlreadyReleasedError` — seen on
+ * oeth-processor in origin-squid v164. The gateway path never hit this: evm-processor
+ * defaults the chain client to a 30s timeout.
+ *
+ * A timeout alone would turn the hang into a crash (rpc-client defaults to 0 retries),
+ * so timeouts — and the other errors rpc-client treats as connection errors (ECONNRESET,
+ * 429, 502/503/504) — are retried a bounded number of times. Worst case for a provider
+ * that never answers is 6 requests x 30s plus the backoff pauses (~3 min, measured),
+ * well under the 10 min Postgres allows.
+ */
+const PORTAL_RPC_REQUEST_TIMEOUT_MS = 30_000
+const PORTAL_RPC_RETRY_ATTEMPTS = 5
+
+export const createPortalRpcClient = (url: string) =>
+  new RpcClient({
+    url,
+    maxBatchCallSize: url.includes('alchemy.com') ? 1 : 100,
+    requestTimeout: PORTAL_RPC_REQUEST_TIMEOUT_MS,
+    retryAttempts: PORTAL_RPC_RETRY_ATTEMPTS,
+  })
+
+/**
  * Run a squid on the Portal SDK — `@subsquid/evm-stream` +
  * `@subsquid/batch-processor`, consuming the portal's real-time `/stream`
  * rather than polling an RPC endpoint for the chain head.
@@ -267,10 +292,7 @@ export const runPortal = async (squidProcessor: SquidProcessor) => {
   // wired here rather than by the SDK.
   const url = config.endpoints[0] || 'http://localhost:8545'
   console.log('rpc url', url)
-  const client = new RpcClient({
-    url,
-    maxBatchCallSize: url.includes('alchemy.com') ? 1 : 100,
-  })
+  const client = createPortalRpcClient(url)
   const log = createLogger('sqd:processor:mapping')
 
   const handler = createSquidHandler({
