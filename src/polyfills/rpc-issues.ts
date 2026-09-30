@@ -27,11 +27,30 @@ const getMethodCUCost = (method: string): number => {
 const BLOCK_NOT_FOUND_RETRIES = 10
 const BLOCK_NOT_FOUND_RETRY_MS = 150
 
-const isBlockNotFound = (err: any) =>
-  err != null &&
-  (err.code === -32001 || err.code === -32000) &&
-  typeof err.message === 'string' &&
-  /block not found|header not found|unknown block|missing trie node/i.test(err.message)
+// Some providers answer with HTTP 400 instead of a JSON-RPC error (dRPC:
+// `{code: 26, message: 'Unknown block'}`), which `@subsquid/http-client` throws
+// as an `HttpError` whose own message is only "Got 400 from <url>". The JSON-RPC
+// error is in the response body, so look there too.
+const rpcErrorOf = (err: any) => {
+  const body = err?.response?.body
+  if (Array.isArray(body)) return body.find((r) => r?.error)?.error ?? err
+  return body?.error ?? err
+}
+
+const isBlockNotFound = (err: any) => {
+  const rpcError = rpcErrorOf(err)
+  return (
+    rpcError != null &&
+    (rpcError.code === -32001 || rpcError.code === -32000 || rpcError.code === 26) &&
+    typeof rpcError.message === 'string' &&
+    /block not found|header not found|unknown block|missing trie node/i.test(rpcError.message)
+  )
+}
+
+// `RpcClient.batchCall` sends a single-call batch through `this.call`, which
+// would nest this retry inside the batch retry (up to 11 x 11 attempts). The
+// batch path marks its options so the inner `call` does not retry again.
+const NO_HEAD_RETRY = Symbol('noHeadRetry')
 
 const callWithHeadRetry = async function (this: any, method: string, params?: any[], options?: any) {
   for (let attempt = 0; ; attempt++) {
@@ -60,7 +79,9 @@ RpcClient.prototype.call = async function <T = any>(
     processingStats.ethCallCounts.set(callMethod, count + 1);
   }
 
-  const response = await callWithHeadRetry.call(this, method, params, options);
+  const response = (options as any)?.[NO_HEAD_RETRY]
+    ? await (this as any)._call(method, params, options)
+    : await callWithHeadRetry.call(this, method, params, options);
 
   if (method === 'debug_traceBlockByHash') {
     fixSelfDestructs(response);
@@ -82,7 +103,7 @@ RpcClient.prototype.batchCall = async function <T = any>(batch: RpcCall[], optio
   let response: any
   for (let attempt = 0; ; attempt++) {
     try {
-      response = await (this as any)._batchCall(batch, options)
+      response = await (this as any)._batchCall(batch, { ...options, [NO_HEAD_RETRY]: true })
       break
     } catch (err) {
       if (attempt >= BLOCK_NOT_FOUND_RETRIES || !isBlockNotFound(err)) throw err
